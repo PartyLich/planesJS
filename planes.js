@@ -8,6 +8,6 @@ $(function() {
 
   window.requestAnimationFrame = requestAnimationFrame;
 
-  var engine = new Engine();
-  engine.home();
+  var engine = new Engine()
+      .home();
 });
