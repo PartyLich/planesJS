@@ -1,0 +1,22 @@
+{
+    "scores": [
+        {
+            "name": "AEJ",
+            "date": "01/01/2012",
+            "level": 99,
+            "score": 128
+        },
+        {
+            "name": "XYZ",
+            "date": "01/01/2012",
+            "level": 2,
+            "score": 64
+        },
+        {
+            "name": "QWE",
+            "date": "01/01/2012",
+            "level": 2,
+            "score": 32
+        }
+    ]
+}

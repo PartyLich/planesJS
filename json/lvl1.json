@@ -1,0 +1,36 @@
+{
+  "bg": "Washington_national_airport.jpg",
+  "runways": [
+    {
+      "x": 740,
+      "y": 115
+    },
+    {
+      "x": 137,
+      "y": 153
+    }
+  ],
+  "events": [
+    {
+      "time": 0,
+      "planes": [
+        {
+          "type": 0,
+          "location": {
+            "x": 300,
+            "y": 600
+          },
+          "heading": 0
+        },
+        {
+          "type": 1,
+          "location": {
+            "x": 300,
+            "y": 300
+          },
+          "heading": 3.1415926535
+        }
+      ]
+    }
+  ]
+}
