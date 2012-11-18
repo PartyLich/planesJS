@@ -1,8 +1,6 @@
 //class Action {
 function Action(json) {
-//  num time; //When the even should happen, in seconds.
   this.time = 0;  //When the even should happen, in seconds.
-//  List<Map> planes; //Plane type(s) that should be added.
   this.planes = [];     //Plane type(s) that should be added.
 
   if(json) {
@@ -11,7 +9,6 @@ function Action(json) {
 }
 
 Action.prototype.fromJson = function (json) {
-//this.time = json['time'];
   this.time = json['time'];
 //  this.planes = new List.from(json['planes']);
   this.planes = new Array().concat(json['planes']);
@@ -19,7 +16,11 @@ Action.prototype.fromJson = function (json) {
 };
 
 //class Level {
+function Level() {
 //  String bg;
+  this.bg = '';
 //  List<Coord> runways;
+  this.runways = [];
 //  List<Action> events;
-//}
+  this.events = [];
+}
