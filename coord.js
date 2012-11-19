@@ -16,8 +16,8 @@ Coord.prototype.initialize = function (opt) {
 //  Coord.init(int this._x, int this._y) {}
   var key = null,
       default_args = {
-        'x' : 0,
-        'y' : 0
+        x : 0,
+        y : 0
       };
 
   opt = (opt || default_args);
