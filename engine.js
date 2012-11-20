@@ -35,39 +35,15 @@ function Engine() {
   path4.hue = new Hue(0, 170, 0); //'#00AA00'
 
   //Initialize plane sprites
-  var imgTmp = new Image(),
-      alphaTmp = new Image();
   //Leer jet
-/*  loadQueue-=2;
-  $(imgTmp).one('load', resourceLoad);
-  $(alphaTmp).one('load', resourceLoad);
-  imgTmp.src = 'img/Leer.jpg';
-  alphaTmp.src = 'img/Leer.jpg';*/
-//  imgPlanes.push({img : imgTmp, alpha : alphaTmp});
   imgPlanes.push({img : loadImage('img/Leer.jpg'),
                   alpha : loadImage('img/Leer.jpg')
                  });
   //Airliner
-/*  imgTmp = new Image();
-  alphaTmp = new Image();
-  loadQueue -= 2;
-  $(imgTmp).one('load', resourceLoad);
-  $(alphaTmp).one('load', resourceLoad);
-  imgTmp.src = 'img/AirlinerClr.jpg';
-  alphaTmp.src = 'img/Airliner.jpg';
-  imgPlanes.push({img : imgTmp, alpha : alphaTmp});*/
   imgPlanes.push({img : loadImage('img/AirlinerClr.jpg'),
                   alpha : loadImage('img/Airliner.jpg')
                  });
   //Cessna;
-/*  imgTmp = new Image();
-  alphaTmp = new Image();
-  loadQueue -= 2;
-  $(imgTmp).one('load', resourceLoad);
-  $(alphaTmp).one('load', resourceLoad);
-  imgTmp.src = 'img/CessnaClr.jpg';
-  alphaTmp.src = 'img/Cessna.jpg';
-  imgPlanes.push({img : imgTmp, alpha : alphaTmp});*/
   imgPlanes.push({img : loadImage('img/CessnaClr.jpg'),
                   alpha : loadImage('img/Cessna.jpg')
                  });
@@ -208,35 +184,8 @@ function Engine() {
       }
 
       //Collision detection
-      for(i = index+1; i < objList.length; i++) {
-//        console.log('i='+ i, ' obj.dist(objList['+i+'].pos)='+ obj.dist(objList[i].pos)
-//            +' max(r=)'+ Math.max(obj.pos.r, objList[i].pos.r));
-        if(obj.dist(objList[i].pos) <= Math.max(obj.pos.r, objList[i].pos.r)
-            && !(objList[i].landing || obj.landing)) {  //Collision! oh noes!
-          //Canvas cleanup
-          objList[i].clear(ctxFront);
-
-          //Update index of selected plane.
-//          if(obj.selected || objs4[i].selected) selected = null;
-          if(obj.selected || objList[i].selected) selected = null;
-          if(selected != null) {
-            if(selected >= i) selected -= 2;
-            else selected--;
-          }
-
-          //Remove crashed planes.
-          console.log('objList.splice('+ i +', 1)');
-          objList.splice(i, 1);
-          console.log('objList.splice('+ index +', 1)');
-          objList.splice(index, 1);
-
-          i--;
-
-          //Scoring
-          collisions++;
-          score--;
-        }
-      } //Bottom of collision detection loop.
+      if(collisionDetection(index, obj))
+        return;
 
       //New position.
       var x = obj.pos.x + Math.round(obj.vx),
@@ -774,8 +723,46 @@ function Engine() {
     objList.push(plane);
   }
 
-  function collisionDetection() {
 
+  /**
+   * @param {Number} index  Objectlist index.
+   * @param {Plane} obj   Plane referenced by index.
+   * @returns {Boolean} True if collision detected.
+   */
+  function collisionDetection(index, obj) {
+  //Collision detection
+    for(var i = index+1; i < objList.length; i++) {
+//      console.log('i='+ i, ' obj.dist(objList['+i+'].pos)='+ obj.dist(objList[i].pos)
+//          +' max(r=)'+ Math.max(obj.pos.r, objList[i].pos.r));
+      if(obj.dist(objList[i].pos) <= Math.max(obj.pos.r, objList[i].pos.r)
+          && !(objList[i].landing || obj.landing)) {  //Collision! oh noes!
+        //Canvas cleanup
+        objList[i].clear(ctxFront);
+
+        //Update index of selected plane.
+        if(obj.selected || objList[i].selected) selected = null;
+        if(selected != null) {
+          if(selected >= i) selected -= 2;
+          else selected--;
+        }
+
+        //Remove crashed planes.
+        console.log('objList.splice('+ i +', 1)');
+        objList.splice(i, 1);
+        console.log('objList.splice('+ index +', 1)');
+        objList.splice(index, 1);
+
+        i--;
+
+        //Scoring
+        collisions++;
+        score--;
+
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -784,8 +771,8 @@ function Engine() {
    */
   function loadImage(src) {
     var imgTmp = new Image();
-console.log('Loading img: ' + src);
-    loadQueue -= 1;
+
+    loadQueue--;
     $(imgTmp).one('load', resourceLoad);
     imgTmp.src = src;
 
