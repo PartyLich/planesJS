@@ -9,21 +9,21 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
         loadQueue = 1,
         drag = false,
         path4 = new Path(),
-  //  Stopwatch stpWatch4, stpFrame;
+  //  Stopwatch stpWatch4, stpFrame
         stpFrame = {},
         stpWatch4 = {},
         bg = new Image(),
-  //  Plane leer;
+  //  Plane leer
   //      leer = null,
   //  CanvasElement cvs4, cvsBg;
-      cvsFront = $('#cvsFront')[0], cvsBg = $('#cvsBg')[0],
-      objList = [], levels = [],
-  //  imgPlanes = new List<ImageElement>();
-      imgPlanes = [],
-  //  eventList = new List<Action>();
-      eventList = [],
-  //  runways = new List<Path>();
-      runways = [];
+        cvsFront = $('#cvsFront')[0], cvsBg = $('#cvsBg')[0],
+        objList = [], levels = [],
+    //  imgPlanes = new List<ImageElement>()
+        imgPlanes = [],
+    //  eventList = new List<Action>()
+        eventList = [],
+    //  runways = new List<Path>()
+        runways = [];
 
 
     //Get canvas contexts.
@@ -74,6 +74,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       frameCount = 0;
   //    stpFrame.reset();
       stpFrame.elapsedMilliseconds = 0;
+  //    stpFrame.start();
       stpFrame.start = Date.now();
 
       //Reset scoring.
@@ -92,7 +93,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       $(cvsFront).mouseup(mUp4Path);
 
       //Request first frame.
-  //    stpFrame.start();
+
       window.requestAnimationFrame(gameTick);
     }
 
@@ -100,15 +101,13 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
      *
      */
     function write(message) {
-  //    query('#status').innerHTML = query('#status').innerHTML.concat('$message<br />');
       $('#status')[0].innerHTML += message + '<br />';
     }
 
-  /**
-   * @param {Number} time  When this animation frame is scheduled to run.
-   */
+    /**
+     * @param {Number} time  When this animation frame is scheduled to run.
+     */
     function gameTick(time) {
-      var i;
 
       //Make sure we're loaded.
       if(loadQueue < 1) {
@@ -147,7 +146,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
       //Process object list
       $.each(objList, function (index, obj) {
-  //      console.log('index:', index);
         if(!objList[index])  return;
 
         //Erase the foreground canvas.
@@ -203,7 +201,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
   //        ctxFront.fillText('obj.dist(path4[0]): '+obj.dist(path4[0])+' obj.r:'+obj.r, cX/2+100, 10);
           if(obj.dist(path4[0]) <= obj.pos.r) {
             //Plane has no path, path4 has a point, and plane is near the start of path4
-              obj.path = path4;
+            obj.path = path4;
   //          obj.path = new Path(path4);
   //          obj.path = (new Path()).concat(path4);
             obj.waypoint = 1;
@@ -239,7 +237,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           }
         }
       });
-
 
       //Draw the map path if it has any points.
       if(path4.length) path4.draw(ctxFront);
@@ -279,24 +276,24 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     /** Display the home splash screen and such.
      */
     function home() {
-      var btnStart = $('#btnStart'),
-          btnScore = $('#btnScore');
+      var $btnStart = $('#btnStart'),
+          $btnScore = $('#btnScore');
 
       //Create nav buttons if they don't already exist.
-      if(!btnStart.length) {
-        btnStart = $('<button id="btnStart"></button>').text('START');
+      if(!$btnStart.length) {
+        $btnStart = $('<button id="btnStart"></button>').text('START');
 
-        $('body').append(btnStart);
+        $('body').append($btnStart);
       }
-      if(!btnScore.length) {
-        btnScore = $('<button id="btnScore"></button>').text('SCORES');
+      if(!$btnScore.length) {
+        $btnScore = $('<button id="btnScore"></button>').text('SCORES');
 
-        $('body').append(btnScore);
+        $('body').append($btnScore);
       }
 
       //Show buttons
-      btnStart.show();
-      btnScore.show();
+      $btnStart.show();
+      $btnScore.show();
 
       //Hide the high score list.
       if($('#scoreTable').length) $('#scoreTable').hide();
@@ -309,18 +306,18 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       ctxFront.fillText('AIRPLANE!', 250, 40);
 
       //Display buttons
-      btnStart.css('position', 'absolute')
+      $btnStart.css('position', 'absolute')
           .css('top', $(cvsFront).height() * .75 + 'px')
           .css('left', $(cvsFront).width() *.33 + 'px')
           .css('z-index', '3');
-      btnScore.css('position', 'absolute')
-          .css('top', btnStart.css('top'))
+      $btnScore.css('position', 'absolute')
+          .css('top', $btnStart.css('top'))
           .css('left', $(cvsFront).width() *.33 + 100 + 'px')
           .css('z-index', '3');
 
       //Add some event handlers
-      btnStart.one('click', startClick);
-      btnScore.one('click', scoreClick);
+      $btnStart.one('click', startClick);
+      $btnScore.one('click', scoreClick);
     }
 
     /** Loads the level specified by the [String] uri
@@ -879,5 +876,5 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     };
   }
 
-return Engine;
+  return Engine;
 });
