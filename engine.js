@@ -1,7 +1,7 @@
+define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball, Hue, Path, Plane, Action) {
 /**
  *
  */
-
 //class Engine {
 function Engine() {
   var self = this;
@@ -895,3 +895,6 @@ function Engine() {
     home : home
   };
 }
+
+return Engine;
+});
