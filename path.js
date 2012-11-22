@@ -7,7 +7,7 @@ define(['coord', 'hue'], function(Coord, Hue){
    */
   function Path(length) {
     //Super
-    Array.call(this);
+    Array.call(this, length);
 
     this.topLeft = new Coord({x:9000, y:9000});
     this.bottomRight = new Coord({x:0, y:0});
@@ -110,6 +110,24 @@ define(['coord', 'hue'], function(Coord, Hue){
    */
   Path.prototype.last = function () {
     return new Coord({x: this[this.length - 1].x, y: this[this.length - 1].y});
+  };
+
+
+  /** Returns a new {Path} identical to other.
+   * @param {Path} other
+   * @returns {Path}
+   */
+  Path.prototype.fromOther = function (other) {
+    var i, newpath;
+
+    newpath = new Path(other.length);
+    newpath.hue = new Hue(other.hue.r, other.hue.g, other.hue.b, other.hue.a);
+
+    for(i = 0; i < other.length; i++) {
+      newpath.push(other[i]);
+    }
+
+    return newpath;
   };
 
 
