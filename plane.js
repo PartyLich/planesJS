@@ -82,6 +82,22 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
     this.pos.r = Math.round(Math.max(this.width, this.height) / 2 * this.scale);
   };
 
+  /**
+   * @param {Path} path
+   */
+  Plane.prototype.setPath = function (path) {
+    this.path = new Path().fromOther(path);
+    this.waypoint = 1;
+  };
+
+
+  /**
+   *
+   */
+  Plane.prototype.nextWaypoint = function () {
+    if(this.hasPath())
+      this.path.shift();
+  };
 
   /** Get the plane's scalar velocity
    * @returns {Number}
@@ -211,12 +227,10 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
    * @param {Path} runway
    */
   Plane.prototype.land = function (runway) {
-  //    path = new Path.from(runway);
-  //  this.path = new Path(runway);
-    this.path = runway;
+    this.setPath(runway);
 
     this.move(this.path[0]);
-    this.waypoint = 0;
+    //this.waypoint = 0;
     this.heading = Math.atan2(runway[1].y - this.pos.y, runway[1].x - this.pos.x);
   //    print('Set heading  vx:${vx} vy:${vy}. Dist(path0):${dist(path[0])}');
     console.log('Set heading  vx:' + this.vx + ' vy:' + this.vy + ' Dist(path0):' + this.dist(this.path[0]));
