@@ -19,19 +19,6 @@ define(['coord', 'hue'], function(Coord, Hue){
   //Correct the constructor pointer.
   Path.prototype.constructor = Path;
 
-  /** Creates a list with the elements of other. The order in the list will be the order provided by the iterator of other. */
-  //  Path.from(Path other) {
-//  Path.prototype.from = function(other) {
-  //    _list = new List.from(other);
-  //    /*topLeft = new Coord.init(9000, 9000);
-  //    bottomRight = new Coord.init(0, 0);
-  //    hue = '#000000';
-  //    */
-  //    topLeft = other.topLeft;
-  //    bottomRight = other.bottomRight;
-  //    hue = other.hue;
-  //  }
-
 
   /** Adds value at the end of the list, extending the length by one.
    * @param {Coord} element
@@ -48,18 +35,18 @@ define(['coord', 'hue'], function(Coord, Hue){
     }
   };
 
+
   //  /**
   //   * Check whether the collection contains an element equal to [element].
   //   */
   //  bool contains(Coord element) => _list.contains(element);
 
-
   //  bool every(bool f(element)) => _list.every(f);
-  //
+
   //  bool some(bool f(element)) => _list.some(f);
 
 
-  /**
+  /** Returns true if this Path is empty.
    * @returns {Boolean}
    */
   Path.prototype.isEmpty = function () {
@@ -80,6 +67,7 @@ define(['coord', 'hue'], function(Coord, Hue){
     return this.length;
   };
 
+
   /** Update loose boundary rect
    *  @param {Number} x
    *  @param {Number} y
@@ -97,6 +85,7 @@ define(['coord', 'hue'], function(Coord, Hue){
       this.bottomRight.y = y;
     }
   };
+
 
   /** Removes all elements in the list. The length of the list becomes zero.
    */

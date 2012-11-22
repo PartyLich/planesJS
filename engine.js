@@ -3,7 +3,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
    *
    */
   function Engine() {
-  //  var self = this;
     var ctxFront, ctxBg,
         cX, cY, frameCount = 0, score = 0, collisions = 0, selected = null, curLevel = 0,
         loadQueue = 1,
@@ -36,17 +35,20 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
     //Initialize plane sprites
     //Leer jet
-    imgPlanes.push({img : loadImage('img/Leer.jpg'),
-                    alpha : loadImage('img/Leer.jpg')
-                   });
+    imgPlanes.push({
+        img : loadImage('img/Leer.jpg'),
+        alpha : loadImage('img/Leer.jpg')
+     });
     //Airliner
-    imgPlanes.push({img : loadImage('img/AirlinerClr.jpg'),
-                    alpha : loadImage('img/Airliner.jpg')
-                   });
+    imgPlanes.push({
+        img : loadImage('img/AirlinerClr.jpg'),
+        alpha : loadImage('img/Airliner.jpg')
+     });
     //Cessna;
-    imgPlanes.push({img : loadImage('img/CessnaClr.jpg'),
-                    alpha : loadImage('img/Cessna.jpg')
-                   });
+    imgPlanes.push({
+        img : loadImage('img/CessnaClr.jpg'),
+        alpha : loadImage('img/Cessna.jpg')
+    });
 
     //Initialize level list
     levels.push('json/lvl1.json');
@@ -89,15 +91,15 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       });
 
       //Register some event handlers!
-      $(cvsFront).mousedown(mDown4);
-      $(cvsFront).mousedown(mDown4Path);
-      $(cvsFront).mousemove(mMove4Path);
-      $(cvsFront).mouseup(mUp4Path);
+      $(cvsFront).mousedown(mDown4)
+                 .mousedown(mDown4Path)
+                 .mousemove(mMove4Path)
+                 .mouseup(mUp4Path);
 
       //Request first frame.
-
       window.requestAnimationFrame(gameTick);
     }
+
 
     /**
      *
@@ -105,6 +107,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     function write(message) {
       $('#status')[0].innerHTML += message + '<br />';
     }
+
 
     /**
      * @param {Number} time  When this animation frame is scheduled to run.
@@ -554,7 +557,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     }
 
     /** Canvas 4 mouseMove event handler for path drawing. */
-  //  void mMove4Path(ev) {
     function  mMove4Path(ev) {
       var next;
       stpWatch4.elapsedMilliseconds = Date.now() - stpWatch4.start;
@@ -581,7 +583,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     }
 
     /** Canvas 4 mouseUp event handler for path drawing. */
-  //  void mUp4Path(ev) {
     function mUp4Path(ev) {
       //Toggle click n drag flag.
       drag = false;
@@ -665,7 +666,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     }
 
     /** Next level button event */
-  //  void nextClick(ev) {
     function nextClick(ev) {
       console.log('nextClick');
       var btnHome = $('#btnStart'),
@@ -688,7 +688,8 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       } else {    //No mas.
       }
     }
-  //
+
+
     /** Add a new plane, optionally specifying type and location
      * @param {int} type
      * @param {Coord} pos
@@ -805,6 +806,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+
     /** Returns a random number between min and max
      * @param {Number} min
      * @param {Number} max
@@ -813,6 +815,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     function getRandom(min, max) {
       return Math.random() * (max - min) + min;
     }
+
 
     /**
      *  Returns the control point for a quadratic bezier from p0 to p2 passing through onCurve.
@@ -839,6 +842,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
   //    return new Coord.init(x1, y1);
   //  }
+
 
     /**
      *  Returns the control points for a cubic bezier from p0 to p3 passing through p4 and p5.

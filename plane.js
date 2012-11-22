@@ -223,6 +223,7 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
     this.pos.move(dest.x, dest.y);
   };
 
+
   /** Land this plane on the specified runway.
    * @param {Path} runway
    */
@@ -230,7 +231,7 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
     this.setPath(runway);
 
     this.move(this.path[0]);
-    //this.waypoint = 0;
+
     this.heading = Math.atan2(runway[1].y - this.pos.y, runway[1].x - this.pos.x);
   //    print('Set heading  vx:${vx} vy:${vy}. Dist(path0):${dist(path[0])}');
     console.log('Set heading  vx:' + this.vx + ' vy:' + this.vy + ' Dist(path0):' + this.dist(this.path[0]));
