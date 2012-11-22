@@ -200,13 +200,12 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
         //Path stuff.
         if(!obj.hasPath() && path4.length) { //Plane has no path, but map does.
-  //        ctxFront.fillText('obj.dist(path4[0]): '+obj.dist(path4[0])+' obj.r:'+obj.r, cX/2+100, 10);
           if(obj.dist(path4[0]) <= obj.pos.r) {
             //Plane has no path, path4 has a point, and plane is near the start of path4
-            obj.path = path4;
-  //          obj.path = new Path(path4);
-  //          obj.path = (new Path()).concat(path4);
-            obj.waypoint = 1;
+            //obj.path = path4;
+            obj.setPath(path4);
+
+            //obj.waypoint = 1;
           }
         }
         if(obj.hasPath()) {
@@ -216,6 +215,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           obj.path.draw(ctxFront);
 
           if(waypoint >= obj.path.length) {  //Path complete.
+            console.log('waypoint', waypoint, 'obj.path.length',  obj.path.length);
             console.log('Path complete (obj).');
             obj.path.undraw(ctxFront);
             obj.path = null;
@@ -230,11 +230,12 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
             //Redirect the plane.
             var head = Math.atan2(obj.path[waypoint].y - obj.pos.y, obj.path[waypoint].x - obj.pos.x);
 
-  //          console.log('Adjusting heading to '+ head * 180/Math.PI +'deg.');
+            console.log('Adjusting heading to '+ head * 180/Math.PI +'deg.');
             obj.setHeading(head);
 
             if(obj.dist(obj.path[waypoint]) <= obj.pos.r * .75) { //We're near the waypoint. Great job!
-              obj.waypoint++;
+              //obj.waypoint++;
+              obj.nextWaypoint();
             }
           }
         }
@@ -264,10 +265,10 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
   //      stpFrame.stop();
 
         //Remove canvas event listeners
-        $(cvsFront).off('mousedown', mDown4);
-        $(cvsFront).off('mousedown', mDown4Path);
-        $(cvsFront).off('mousemove', mMove4Path);
-        $(cvsFront).off('mouseup', mUp4Path);
+        $(cvsFront).off('mousedown', mDown4)
+                   .off('mousedown', mDown4Path)
+                   .off('mousemove', mMove4Path)
+                   .off('mouseup', mUp4Path);
 
         levelEnd();       //inter level transition screen
       } else {
