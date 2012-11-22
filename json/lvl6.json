@@ -1,21 +1,21 @@
 {
-    "bg": "Washington_national_airport.jpg",
+    "bg": "img/DPA_airport_map.PNG",
     "runways": [
         {
-          "x": 451,
-          "y": 314
+            "x": 740,
+            "y": 120
         },
         {
-          "x": 466,
-          "y": 569
+            "x": 137,
+            "y": 153
         },
         {
-          "x": 514,
-          "y": 462
+            "x": 745,
+            "y": 45
         },
         {
-          "x": 394,
-          "y": 300
+            "x": 400,
+            "y": 217
         }
     ],
     "events": [
@@ -34,30 +34,30 @@
                     "type": 1,
                     "location": {
                         "x": 300,
-                        "y": 300
+                        "y": 800
                     },
                     "heading": 3.1415926535
                 }
             ]
         },
         {
-            "time": 5,
+            "time": 4,
             "planes": [
                 {
                     "type": 2,
                     "location": {
-                        "x": 300,
-                        "y": 150
+                        "x": 50,
+                        "y": 100
                     },
-                    "heading": 5
+                    "heading": 1.57079
                 },
                 {
                     "type": 1,
                     "location": {
-                        "x": 300,
-                        "y": 300
+                        "x": 800,
+                        "y": 400
                     },
-                    "heading": 3
+                    "heading": 4.712
                 }
             ]
         }

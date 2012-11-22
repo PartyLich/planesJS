@@ -53,6 +53,11 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     //Initialize level list
     levels.push('json/lvl1.json');
     levels.push('json/lvl2.json');
+    levels.push('json/lvl3.json');
+    levels.push('json/lvl4.json');
+    levels.push('json/lvl5.json');
+    levels.push('json/lvl6.json');
+    levels.push('json/lvl7.json');
 
 
     //Add plane button
@@ -60,6 +65,13 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       addPlane();
     });
 
+/*    $(cvsFront).click(function(ev) {
+      $('body').append('<span>Click: ('+ev.offsetX+', '+ev.offsetY+')<span>');
+      $('body span').css({
+        'position': 'relative',
+        'top': '900px'
+      });
+    });*/
 
     /**
      *
@@ -370,10 +382,16 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
               //Rotate the image 90deg.
               //ctxBg.translate((cX-80), (-80));
-              ctxBg.translate(820, -80);
-              ctxBg.rotate(Math.PI / 2);
+//              ctxBg.translate(820, -80);
+//              ctxBg.translate(820, 0);
+//              ctxBg.rotate(Math.PI / 2);
 
-              ctxBg.drawImage(bg, 0, 0, 400, 800);
+//              ctxBg.drawImage(bg, 0, 0, 400, 800);
+              var width = bg.width/2,
+                  height = bg.height/2,
+                  x = (cX - width) / 2,
+                  y = (cY - height) / 2;
+              ctxBg.drawImage(bg, x, y, Math.round(width), Math.round(height));
               ctxBg.restore();
               ctxBg.font = 'normal 9px sans-serif';
 
