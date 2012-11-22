@@ -8,4 +8,5 @@ There's a fair number of comments, and nothing else.
 
 Other deets
 -----------
-Some dependency management would be smart.
+Dependency management: require.js
+DOM wizardry: jQuery
