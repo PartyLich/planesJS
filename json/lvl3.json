@@ -1,21 +1,21 @@
 {
-    "bg": "Washington_national_airport.jpg",
+    "bg": "img/PVD_airport_map.PNG",
     "runways": [
         {
-          "x": 451,
-          "y": 314
+            "x": 397,
+            "y": 275
         },
         {
-          "x": 466,
-          "y": 569
+            "x": 619,
+            "y": 547
         },
         {
-          "x": 514,
-          "y": 462
+            "x": 572,
+            "y": 300
         },
         {
-          "x": 394,
-          "y": 300
+            "x": 354,
+            "y": 645
         }
     ],
     "events": [
@@ -34,30 +34,30 @@
                     "type": 1,
                     "location": {
                         "x": 300,
-                        "y": 300
+                        "y": 800
                     },
                     "heading": 3.1415926535
                 }
             ]
         },
         {
-            "time": 5,
+            "time": 2,
             "planes": [
                 {
                     "type": 2,
                     "location": {
-                        "x": 300,
-                        "y": 150
+                        "x": 50,
+                        "y": 100
                     },
-                    "heading": 5
+                    "heading": 1.57079
                 },
                 {
                     "type": 1,
                     "location": {
-                        "x": 300,
-                        "y": 300
+                        "x": 800,
+                        "y": 400
                     },
-                    "heading": 3
+                    "heading": 4.712
                 }
             ]
         }
