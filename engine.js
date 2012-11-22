@@ -83,8 +83,10 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
 
       //Place background canvas where it needs to be.
-      $(cvsBg).css('left', $(cvsFront).position().left + 'px')
-          .css('top', $(cvsFront).position().top + 'px');
+      $(cvsBg).css({
+          'left': $(cvsFront).position().left + 'px',
+          'top': $(cvsFront).position().top + 'px'
+      });
 
       //Register some event handlers!
       $(cvsFront).mousedown(mDown4);
@@ -306,14 +308,18 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       ctxFront.fillText('AIRPLANE!', 250, 40);
 
       //Display buttons
-      $btnStart.css('position', 'absolute')
-          .css('top', $(cvsFront).height() * .75 + 'px')
-          .css('left', $(cvsFront).width() *.33 + 'px')
-          .css('z-index', '3');
-      $btnScore.css('position', 'absolute')
-          .css('top', $btnStart.css('top'))
-          .css('left', $(cvsFront).width() *.33 + 100 + 'px')
-          .css('z-index', '3');
+      $btnStart.css({
+          'position' : 'absolute',
+          'top' : $(cvsFront).height() * .75 + 'px',
+          'left' : $(cvsFront).width() *.33 + 'px',
+          'z-index' : '3'
+      });
+      $btnScore.css({
+          'position' : 'absolute',
+          'top' : $btnStart.css('top'),
+          'left' : $(cvsFront).width() *.33 + 100 + 'px',
+          'z-index' : '3'
+      });
 
       //Add some event handlers
       $btnStart.one('click', startClick);
@@ -417,10 +423,12 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           });
 
           //TODO: just give it a canvas sized div and center the darn thing
-          table.css('position', 'absolute')
-              .css('top', $(cvsFront).height() * .35 + 'px')
-              .css('left', $(cvsFront).width() *.25 + 'px')
-              .css('z-index', '2');
+          table.css({
+              'position' : 'absolute',
+              'top' : $(cvsFront).height() * .35 + 'px',
+              'left' : $(cvsFront).width() *.25 + 'px',
+              'z-index' : '2'
+          });
 
           table.show();
       });
@@ -466,14 +474,18 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       btnNext.text('NEXT LEVEL');
 
       //Display buttons
-      btnHome.css('position', 'absolute')
-          .css('top', $(cvsFront).height() * .75 + 'px')
-          .css('left', $(cvsFront).width() *.33 + 'px')
-          .css('z-index', '3');
-      btnNext.css('position', 'absolute')
-          .css('top', btnHome.css('top'))
-          .css('left', $(cvsFront).width() * .33 + 100 + 'px')
-          .css('z-index', '3');
+      btnHome.css({
+          'position' : 'absolute',
+          'top' : $(cvsFront).height() * .75 + 'px',
+          'left' : $(cvsFront).width() *.33 + 'px',
+          'z-index' : '3'
+      });
+      btnNext.css({
+          'position' : 'absolute',
+          'top' : btnHome.css('top'),
+          'left' : $(cvsFront).width() * .33 + 100 + 'px',
+          'z-index' : '3'
+      });
 
       //New event handlers
       btnHome.one('click', homeClick);
