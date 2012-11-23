@@ -1,1 +1,0 @@
-require.config({paths:{jquery:"lib/jquery-1.8.2.min"}});require(["jquery","engine"],function(a,b){a(function(){window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;(new b).home()})});
