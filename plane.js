@@ -1,11 +1,13 @@
-define(['coord','ball', 'path'], function(Coord, Ball, Path){
+define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animation){
 
   /** Plane object.
    * @param {Coord} pos    Starting location
    * @param {Image} img    Sprite
    * @param {Image} alpha  Mask
+   * @param frameWidth     width of each animation frame
+   * @param frameHeight    height of each animation frame
    */
-  function Plane(pos, img, alpha, opt) {
+  function Plane(pos, img, alpha, frameWidth, frameHeight, opt) {
     this.frame = 0;
     this.waypoint = 0;
     this.vx = this.vy = 0;
@@ -23,9 +25,12 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
     this.init(opt);
 
 
-    this.pos = new Ball(pos.x, pos.y, Math.round(Math.max(img.width, img.height) / 2));
-    this.width = img.width;
-    this.height = img.height;
+//    this.pos = new Ball(pos.x, pos.y, Math.round(Math.max(img.width, img.height) / 2));
+    this.pos = new Ball(pos.x, pos.y, Math.round(Math.max(frameWidth, frameHeight) / 2));
+    /*this.width = img.width;
+    this.height = img.height;*/
+    this.width = frameWidth;
+    this.height = frameHeight;
     this.landing = this.selected = false;
 
 
@@ -33,6 +38,26 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
 
     //Init the masked composite image.
     this.initMask(alpha, img);
+    
+    //Animation list
+    this.animations = {};
+    this.animations.crash = new Animation({
+      firstFrame : 2,
+      length : 1,
+      repeat : 10
+    });
+    this.animations.flight = new Animation({
+      firstFrame : 1,
+      length : 1,
+      repeat : -1
+    });
+    
+    this.curAnimation = this.animations.flight;
+    
+    this.frameX = 0;
+    this.frameY = 0;
+    this.cols = img.width / frameWidth;
+    this.rows = img.height / frameHeight;
   }
 
   Plane.prototype.init = function (opt) {
@@ -120,6 +145,16 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
 
     //console.log('Set velocity v:'+v+' angle:'+angle+' vx:'+vx+' vy:'+vy);
   };
+  
+  /** Calculate the top left corner of the current frame.
+   * 
+   */
+  Plane.prototype.updateFrame = function () {
+    this.frameX = (this.frame - 1) * this.width - (Math.floor((this.frame - 1) / this.cols) * this.cols * this.width);
+    console.log('right', (this.frame / this.cols * this.cols * this.width));
+    console.log('this.frame / this.cols', (this.frame / this.cols));
+    this.frameY = (this.frame - 1) / this.cols * this.height;
+  };
 
 
   /** Returns this plane's distance from coordinate b.
@@ -135,6 +170,9 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
    *  @param {CanvasRenderingContext2D} ctx
    */
   Plane.prototype.draw = function (ctx) {
+    //Update frame location
+    this.updateFrame();
+    
     //Save context state.
     ctx.save();
     //Rotate context to draw with proper heading.
@@ -144,8 +182,11 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
     ctx.rotate(this.getHeading() + Math.PI/2);
 
     //Draw final image to the supplied context.
-    ctx.drawImage(this.img, -this.width * this.scale/2, -this.height * this.scale/2,
+//    ctx.drawImage(this.img, -this.width * this.scale/2, -this.height * this.scale/2,
+//        this.width * this.scale, this.height * this.scale);
+    ctx.drawImage(this.img, this.frameX, this.frameY, this.width, this.height, -this.width * this.scale/2, -this.height * this.scale/2,
         this.width * this.scale, this.height * this.scale);
+    console.log('frame', this.frame, 'frameX', this.frameX, 'frameY', this.frameY);
 
     //Draw circle around plane if selected.
     if(this.selected) {
@@ -161,6 +202,21 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
   ////    print("filling text");
   //    //ctx.fillText("(${pos.x.round()}, ${pos.y.round()})", pos.x - (pos.r/2).round(), pos.y);
     //ctx.fillText("(${pos.x.round()}, ${pos.y.round()})", pos.x - (pos.r/2).round(), pos.y);
+    
+    //Advance animation frame.
+    if(this.frame + 1 > this.curAnimation.firstFrame + this.curAnimation.length - 1) {
+      //We've already hit the last frame in the animation. Check repeat
+      
+      this.frame = this.curAnimation.firstFrame;
+      
+      /*if(this.curAnimation.repeat === -1) {
+        this.frame = this.curAnimation.firstFrame;
+      } else */if(this.loop > 0) {        
+        this.loop--;
+      }
+    } else {
+      this.frame++;
+    }
   };
 
   /** Clears the rect currently occupied on the supplied context.
@@ -179,6 +235,18 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
     //Restore context state.
     ctx.restore();
   };
+  
+  /** Crashes this plane.
+   * 
+   */
+  Plane.prototype.crash = function (ctx) {
+    console.log('Beginning crash sequence');
+    //Uh, crash image/animation
+    this.crashing = true;
+    this.curAnimation = this.animations.crash;
+    this.frame = this.curAnimation.firstFrame;
+    this.updateFrame();      
+  };
 
   /** Applies the (inverse) alpha mask and saves the composite [ImageElement] to img.
    * @param {Image} alpha
@@ -187,8 +255,10 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
   Plane.prototype.initMask = function (alpha, img) {
     //Create a buffer for off screen drawing.
     var buffer = document.createElement('canvas');
-    buffer.width = this.width;
-    buffer.height = this.height;
+    /*buffer.width = this.width;
+    buffer.height = this.height;*/
+    buffer.width = img.width;
+    buffer.height = img.height;
 
     var ctxBuf = buffer.getContext('2d');
 
@@ -196,7 +266,8 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
     ctxBuf.drawImage(alpha, 0, 0);
 
     //Get imagedata
-    var imgData = ctxBuf.getImageData(0, 0, this.width, this.height);
+//    var imgData = ctxBuf.getImageData(0, 0, this.width, this.height);
+    var imgData = ctxBuf.getImageData(0, 0, img.width, img.height);
     var data = imgData.data;
 
       //Set alpha channel values for inverse alpha mask.
@@ -204,7 +275,8 @@ define(['coord','ball', 'path'], function(Coord, Ball, Path){
       data[i] = 255 - data[i - 3];
     }
 
-    ctxBuf.clearRect(0, 0, this.width, this.height);
+//    ctxBuf.clearRect(0, 0, this.width, this.height);
+    ctxBuf.clearRect(0, 0, img.width, img.height);
     ctxBuf.putImageData(imgData, 0, 0);
 
     //Combine image + mask on buffer.

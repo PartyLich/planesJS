@@ -109,6 +109,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
                  .mouseup(mUp4Path);
 
       //Request first frame.
+      console.log('about to gameTick');
       window.requestAnimationFrame(gameTick);
     }
 
@@ -138,7 +139,9 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       }
 
       //update timer
-      stpFrame.elapsedMilliseconds = time - stpFrame.start;
+      console.log('time', time);
+      console.log('stpFrame.start', stpFrame.start);
+      stpFrame.elapsedMilliseconds = Date.now() - stpFrame.start;
 
       //Clear displayed text
   //    ctx4.clearRect(cX/2+100-5, 0, cX/2-95, 20); //top right diag text
@@ -146,10 +149,13 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       ctxFront.clearRect(0, cY-35, 150, 20);          //score
 
       //Process current event list item
+      console.log('eventList.length', eventList.length);
       if(eventList.length) {
+	console.log(eventList[0].time, stpFrame.elapsedMilliseconds / 1000);
         if(eventList[0].time <= stpFrame.elapsedMilliseconds / 1000) {
           //Add all planes in this event.
           $.each(eventList[0].planes, function (index, plane) {
+        	console.log('adding plane');
             addPlane(plane.type,
                 new Coord({x: plane.location.x, y: plane.location.y}),
                 plane.heading);
@@ -365,6 +371,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
           //Initialize event list.
             $.each(result.events, function(index, event) {
+              console.log('Adding event', event);
               eventList.push(new Action(event));
             });
 
@@ -373,7 +380,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
             bg.src = result.bg;
 
             $(bg).one('load', function (ev) {
-              console.log('BG loaded');
+              console.log('BG loaded2');
               ctxBg.fillStyle = '#0000EE';
               ctxBg.fillRect(0, 0, cX, cY);
 
@@ -723,7 +730,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           heading = getRandom(0, 2 * Math.PI);
 
       try {
-        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha);
+        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha, imgPlanes[type].img.width, imgPlanes[type].img.height);
       } catch(e) {
         console.log(imgPlanes);
         console.log(e);
@@ -745,6 +752,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       }
 
       plane.setHeading(heading);
+      console.log('Heading set to', heading);
 
       //Add to object list.
       objList.push(plane);
