@@ -35,20 +35,29 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
     //Initialize plane sprites
     //Leer jet
-    imgPlanes.push({
+/*    imgPlanes.push({
         img : loadImage('img/Leer.jpg'),
-        alpha : loadImage('img/Leer.jpg')
+        alpha : loadImage('img/Leer.jpg'),
+        frameWidth : 359,
+        frameHeight : 384
      });
     //Airliner
     imgPlanes.push({
-        img : loadImage('img/AirlinerClr.jpg'),
-        alpha : loadImage('img/Airliner.jpg')
+//        img : loadImage('img/AirlinerClr.jpg'),
+//        alpha : loadImage('img/Airliner.jpg')
+        img : loadImage('img/AirlinerClr2.jpg'),
+        alpha : loadImage('img/Airliner2.jpg'),
+        frameWidth : 522,
+        frameHeight : 450
      });
     //Cessna;
     imgPlanes.push({
         img : loadImage('img/CessnaClr.jpg'),
-        alpha : loadImage('img/Cessna.jpg')
-    });
+        alpha : loadImage('img/Cessna.jpg'),
+        frameWidth : 200,
+        frameHeight : 200
+    });*/
+    loadPlanes();
 
     //Initialize level list
     levels.push('json/lvl1.json');
@@ -730,7 +739,19 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           heading = getRandom(0, 2 * Math.PI);
 
       try {
-        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha, imgPlanes[type].img.width, imgPlanes[type].img.height);
+//        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha, imgPlanes[type].img.width, imgPlanes[type].img.height);
+        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha, imgPlanes[type].frameWidth, imgPlanes[type].frameHeight);
+        
+        console.log(plane.animations.flight);
+        
+        if(type == 1) {
+          plane.animations.flight.firstFrame = 1;
+          plane.animations.flight.length = 8;
+          plane.animations.flight.repeat = -1;
+          plane.animations.flight.fps = 15;
+            
+//          console.log(plane.animations.flight);
+        }
       } catch(e) {
         console.log(imgPlanes);
         console.log(e);
@@ -757,6 +778,30 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       //Add to object list.
       objList.push(plane);
     }
+    
+    
+    function loadPlanes() {
+    //Initialize plane sprites
+
+    //Open synchronous GET request.
+      $.ajax('json/planes.json', {
+        async : false,
+        dataType : 'json',
+        success : function(result) {
+          //Initialize plane list.
+          $.each(result.planes, function(index, plane) {
+            console.log('Adding plane', plane);
+            
+            imgPlanes.push({
+              img : loadImage(plane.img),
+              alpha : loadImage(plane.alpha),
+              frameWidth : plane.frameWidth,
+              frameHeight : plane.frameHeight
+            });
+          });          
+        }
+      });
+    } //End of function loadPlanes()
 
 
     /**

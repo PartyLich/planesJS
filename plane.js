@@ -50,14 +50,22 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
       firstFrame : 1,
       length : 1,
       repeat : -1
+//      fps : 60
     });
+/*    this.animations.flight = new Animation({
+      firstFrame : 1,
+      length : 8,
+      repeat : -1
+    });*/
     
     this.curAnimation = this.animations.flight;
     
-    this.frameX = 0;
-    this.frameY = 0;
-    this.cols = img.width / frameWidth;
-    this.rows = img.height / frameHeight;
+    this.frameX = 0;    //x location of current frame.
+    this.frameY = 0;    //y location of current frame.
+    this.cols = Math.floor(img.width / frameWidth);
+    this.rows = Math.floor(img.height / frameHeight);
+    
+    this.fCount = 0;    //number of times the current frame has been displayed.
   }
 
   Plane.prototype.init = function (opt) {
@@ -151,9 +159,10 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
    */
   Plane.prototype.updateFrame = function () {
     this.frameX = (this.frame - 1) * this.width - (Math.floor((this.frame - 1) / this.cols) * this.cols * this.width);
-    console.log('right', (this.frame / this.cols * this.cols * this.width));
-    console.log('this.frame / this.cols', (this.frame / this.cols));
-    this.frameY = (this.frame - 1) / this.cols * this.height;
+//    console.log('right', (this.frame / this.cols * this.cols * this.width));
+//    console.log('this.frame / this.cols', (this.frame / this.cols));
+//    console.log('this.cols', this.cols, 'this.height', this.height);
+    this.frameY = Math.floor((this.frame - 1) / this.cols) * this.height;
   };
 
 
@@ -172,6 +181,9 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
   Plane.prototype.draw = function (ctx) {
     //Update frame location
     this.updateFrame();
+    //increment current frame draw counter
+    this.fCount++;
+//    console.log('fCount', this.fCount);
     
     //Save context state.
     ctx.save();
@@ -214,8 +226,17 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
       } else */if(this.loop > 0) {        
         this.loop--;
       }
+      
+      //reset current frame draw counter
+      this.fCount = 0;
     } else {
-      this.frame++;
+      console.log('this.curAnimation.fps', this.curAnimation.fps);
+      if(this.fCount >= (60 / this.curAnimation.fps)) {  //check if we've repeated the current frame enough times
+        this.frame++;
+        
+        //reset current frame draw counter
+        this.fCount = 0;
+      }
     }
   };
 

@@ -1,0 +1,22 @@
+{
+  "planes" : [
+    {
+      "img" : "img/Leer.jpg",
+      "alpha" : "img/Leer.jpg",
+      "frameWidth" : 359,
+      "frameHeight" : 384
+    },
+    {
+      "img" : "img/AirlinerClr2.jpg",
+      "alpha" : "img/Airliner2.jpg",
+      "frameWidth" : 522,
+      "frameHeight" : 450
+    },
+    {
+      "img" : "img/CessnaClr.jpg",
+      "alpha" : "img/Cessna.jpg",
+      "frameWidth" : 200,
+      "frameHeight" : 200
+    }
+  ]
+}

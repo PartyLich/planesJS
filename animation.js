@@ -3,7 +3,7 @@ define(function () {
     this.firstFrame = 0;  //
     this.length = 0;     //
     this.repeat = 0;
-    this.framerate = 0; 
+    this.fps = 0; 
 
     this.init(opts);
   }
@@ -14,7 +14,7 @@ define(function () {
         firstFrame : 0,
         length : 0,
         repeat : 0,
-        framerate : 0
+        fps : 60
       };
 
     opt = (opt || default_args);
