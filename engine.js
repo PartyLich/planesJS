@@ -739,17 +739,21 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           heading = getRandom(0, 2 * Math.PI);
 
       try {
-//        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha, imgPlanes[type].img.width, imgPlanes[type].img.height);
         var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha, imgPlanes[type].frameWidth, imgPlanes[type].frameHeight);
-        
+
         console.log(plane.animations.flight);
-        
+
         if(type == 1) {
           plane.animations.flight.firstFrame = 1;
           plane.animations.flight.length = 8;
           plane.animations.flight.repeat = -1;
           plane.animations.flight.fps = 15;
-            
+
+          plane.animations.crash.firstFrame = 9;
+          plane.animations.crash.length = 8;
+          plane.animations.crash.repeat = 0;
+          plane.animations.crash.fps = 15;
+
 //          console.log(plane.animations.flight);
         }
       } catch(e) {
@@ -778,8 +782,8 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       //Add to object list.
       objList.push(plane);
     }
-    
-    
+
+
     function loadPlanes() {
     //Initialize plane sprites
 
@@ -791,14 +795,14 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           //Initialize plane list.
           $.each(result.planes, function(index, plane) {
             console.log('Adding plane', plane);
-            
+
             imgPlanes.push({
               img : loadImage(plane.img),
               alpha : loadImage(plane.alpha),
               frameWidth : plane.frameWidth,
               frameHeight : plane.frameHeight
             });
-          });          
+          });
         }
       });
     } //End of function loadPlanes()
