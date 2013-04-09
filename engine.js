@@ -148,8 +148,8 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       }
 
       //update timer
-      console.log('time', time);
-      console.log('stpFrame.start', stpFrame.start);
+/*      console.log('time', time);
+      console.log('stpFrame.start', stpFrame.start);*/
       stpFrame.elapsedMilliseconds = Date.now() - stpFrame.start;
 
       //Clear displayed text
@@ -158,7 +158,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       ctxFront.clearRect(0, cY-35, 150, 20);          //score
 
       //Process current event list item
-      console.log('eventList.length', eventList.length);
+//      console.log('eventList.length', eventList.length);
       if(eventList.length) {
 	console.log(eventList[0].time, stpFrame.elapsedMilliseconds / 1000);
         if(eventList[0].time <= stpFrame.elapsedMilliseconds / 1000) {
@@ -183,6 +183,22 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
         //Erase the foreground canvas.
         obj.clear(ctxFront);
 
+        //remove dead planes
+        console.log('obj.dead', obj.dead);
+        if(obj.dead) {
+          if(obj.selected) selected = null;
+
+          console.log('objList.splice('+ index +', 1)');
+          objList.splice(index, 1);
+
+          //Update selected index
+          if(selected != null) {
+            if(selected >= index) selected--;
+          }
+          
+          return;
+        }
+        
         //remove landed planes
         if(obj.landing && Math.round(obj.velocity()) <= 0) {
             if(obj.selected) selected = null;
@@ -751,7 +767,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
           plane.animations.crash.firstFrame = 9;
           plane.animations.crash.length = 8;
-          plane.animations.crash.repeat = 0;
+          plane.animations.crash.repeat = 1;
           plane.animations.crash.fps = 15;
 
 //          console.log(plane.animations.flight);
@@ -819,7 +835,8 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
   //      console.log('i='+ i, ' obj.dist(objList['+i+'].pos)='+ obj.dist(objList[i].pos)
   //          +' max(r=)'+ Math.max(obj.pos.r, objList[i].pos.r));
         if(obj.dist(objList[i].pos) <= Math.max(obj.pos.r, objList[i].pos.r)
-            && !(objList[i].landing || obj.landing)) {  //Collision! oh noes!
+            && !(objList[i].landing || obj.landing)
+            && !(objList[i].crashing || obj.crashing)) {  //Collision! oh noes!
           //Canvas cleanup
           objList[i].clear(ctxFront);
 
@@ -831,12 +848,17 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
           }
 
           //Remove crashed planes.
-          console.log('objList.splice('+ i +', 1)');
+/*          console.log('objList.splice('+ i +', 1)');
           objList.splice(i, 1);
           console.log('objList.splice('+ index +', 1)');
           objList.splice(index, 1);
 
-          i--;
+          i--;*/
+          
+          //Start crash sequences
+          obj.crash();
+          objList[i].crash();
+          
 
           //Scoring
           collisions++;

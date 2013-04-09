@@ -42,9 +42,9 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
     //Animation list
     this.animations = {};
     this.animations.crash = new Animation({
-      firstFrame : 2,
+      firstFrame : 1,
       length : 1,
-      repeat : 10
+      repeat : 6      
     });
     this.animations.flight = new Animation({
       firstFrame : 1,
@@ -58,7 +58,8 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
       repeat : -1
     });*/
     
-    this.curAnimation = this.animations.flight;
+//    this.curAnimation = this.animations.flight;
+    this.setAnim(this.animations.flight);
     
     this.frameX = 0;    //x location of current frame.
     this.frameY = 0;    //y location of current frame.
@@ -66,6 +67,10 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
     this.rows = Math.floor(img.height / frameHeight);
     
     this.fCount = 0;    //number of times the current frame has been displayed.
+//    this.loop = 0;
+    
+    this.crashing = false;
+    this.dead = false;
   }
 
   Plane.prototype.init = function (opt) {
@@ -92,6 +97,15 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
   //    //print('Heading atan2(${vy}/${vx}): ${Math.atan2(vy, vx)}');
     return Math.atan2(this.vy, this.vx);
   };
+  
+  /** Set this plane's current animation.
+   * @param {Animation} animation The animation to use
+   */
+  Plane.prototype.setAnim = function (animation) {
+    this.curAnimation = animation;
+    this.frame = this.curAnimation.firstFrame;
+    this.loop = animation.repeat;
+  }
 
   /** Set this plane's heading.
    * @param {Number} angle Heading in radians.
@@ -218,19 +232,26 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
     //Advance animation frame.
     if(this.frame + 1 > this.curAnimation.firstFrame + this.curAnimation.length - 1) {
       //We've already hit the last frame in the animation. Check repeat
-      
+console.log('End of current animation loop');      
       this.frame = this.curAnimation.firstFrame;
       
-      /*if(this.curAnimation.repeat === -1) {
+      if(this.curAnimation.repeat === -1) {
         this.frame = this.curAnimation.firstFrame;
-      } else */if(this.loop > 0) {        
+      } else if(this.loop > 0) {        
         this.loop--;
+      }
+      
+      //Crash sequence complete?
+      if(this.crashing) {
+        console.log('Setting plane to DEAD');
+        this.dead = true;
+        return;
       }
       
       //reset current frame draw counter
       this.fCount = 0;
     } else {
-      console.log('this.curAnimation.fps', this.curAnimation.fps);
+//      console.log('this.curAnimation.fps', this.curAnimation.fps);
       if(this.fCount >= (60 / this.curAnimation.fps)) {  //check if we've repeated the current frame enough times
         this.frame++;
         
@@ -260,13 +281,16 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
   /** Crashes this plane.
    * 
    */
-  Plane.prototype.crash = function (ctx) {
+  Plane.prototype.crash = function () {
     console.log('Beginning crash sequence');
     //Uh, crash image/animation
     this.crashing = true;
-    this.curAnimation = this.animations.crash;
-    this.frame = this.curAnimation.firstFrame;
-    this.updateFrame();      
+//    this.curAnimation = this.animations.crash;
+    this.setAnim(this.animations.crash);
+    console.log('Animation set to', this.curAnimation);
+//    this.frame = this.curAnimation.firstFrame;
+    this.fCount = 0;
+    this.updateFrame();
   };
 
   /** Applies the (inverse) alpha mask and saves the composite [ImageElement] to img.
