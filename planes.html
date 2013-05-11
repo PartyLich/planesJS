@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="ISO-8859-1">
-  <title>Test</title>
-  <link rel="stylesheet" href="style.css" type='text/css'>
-  
-  <script src="lib/jquery-1.8.2.min.js"></script>
-  <script src="lib/require.min.js" data-main="planes"></script>  
-</head>
-  <body> 
-    <canvas id='cvsFront' style="position : absolute; z-index: 1;" width="900" height="900"></canvas>
-    <canvas id='cvsBg' style="position: absolute; z-index: 0;" width="900" height="900"></canvas>
-    <a id='repo' href="https://github.com/PartyLich/planesJS">Back to the repo</a>
+  <head>
+    <meta charset="ISO-8859-1">
+    <title>Test</title>
+    <link rel="stylesheet" href="style.css" type='text/css'>
+
+    <script src="lib/require.min.js" data-main="planes"></script>
+    <script src="lib/jquery-1.8.2.min.js"></script>
+  </head>
+  <body>
+    <div id="viewport" style="">
+      <canvas id="cvsFront" style="position : absolute; z-index: 1;" width="900" height="900"></canvas>
+      <canvas id="cvsBg" style="position: absolute; z-index: 0;" width="900" height="900"></canvas>
+      <div id="divNotice">
+        <span style="">
+        Your score: 1337<br>Planes collided: 0
+        </span>
+      </div>
+    </div>
+    <a id="repo" href="https://github.com/PartyLich/planesJS">Back to the repo</a>
   </body>
 </html>

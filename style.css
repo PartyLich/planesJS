@@ -19,8 +19,31 @@ td {
   text-align: center;
   border-top: solid 1px rgb(241, 241, 241);
 }
+<<<<<<< HEAD
 
 #repo {
   position: relative;
   top: 900px;
+=======
+#repo {
+  position: relative;
+  margin: 0px auto;
+}
+#viewport {
+  margin: 0px auto;
+  width: 900px;
+  height: 900px;
+}
+#divNotice {
+  display: none;  
+  position: relative;
+  top: 50%;
+  text-align: center;
+  font-weight: bold;
+  font-size:  30px;
+  font-family: Courier;
+}
+#divNotice span {
+  margin: auto;
+>>>>>>> New build
 }
