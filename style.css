@@ -4,7 +4,6 @@ button {
   border-radius: 6px;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 1);
 }
-
 table {
   border-style: solid;
   border-color: rgb(243, 242, 242);
@@ -12,19 +11,12 @@ table {
 	border-radius: 5px;
 	border-spacing: 0px;
 }
-
 td {
   padding: 2px 15px;
   vertical-align: middle;
   text-align: center;
   border-top: solid 1px rgb(241, 241, 241);
 }
-<<<<<<< HEAD
-
-#repo {
-  position: relative;
-  top: 900px;
-=======
 #repo {
   position: relative;
   margin: 0px auto;
@@ -45,5 +37,4 @@ td {
 }
 #divNotice span {
   margin: auto;
->>>>>>> New build
 }
