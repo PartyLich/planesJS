@@ -9,7 +9,9 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
         drag = false,
         path4 = new Path(),
   //  Stopwatch stpWatch4, stpFrame
+        //stpFrame = new StopWatch(),
         stpFrame = {},
+//        stpWatch4 = new StopWatch(),
         stpWatch4 = {},
         bg = new Image(),
   //  Plane leer
@@ -34,29 +36,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
     path4.hue = new Hue(0, 170, 0); //'#00AA00'
 
     //Initialize plane sprites
-    //Leer jet
-/*    imgPlanes.push({
-        img : loadImage('img/Leer.jpg'),
-        alpha : loadImage('img/Leer.jpg'),
-        frameWidth : 359,
-        frameHeight : 384
-     });
-    //Airliner
-    imgPlanes.push({
-//        img : loadImage('img/AirlinerClr.jpg'),
-//        alpha : loadImage('img/Airliner.jpg')
-        img : loadImage('img/AirlinerClr2.jpg'),
-        alpha : loadImage('img/Airliner2.jpg'),
-        frameWidth : 522,
-        frameHeight : 450
-     });
-    //Cessna;
-    imgPlanes.push({
-        img : loadImage('img/CessnaClr.jpg'),
-        alpha : loadImage('img/Cessna.jpg'),
-        frameWidth : 200,
-        frameHeight : 200
-    });*/
     loadPlanes();
 
     //Initialize level list
@@ -74,13 +53,6 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       addPlane();
     });
 
-/*    $(cvsFront).click(function(ev) {
-      $('body').append('<span>Click: ('+ev.offsetX+', '+ev.offsetY+')<span>');
-      $('body span').css({
-        'position': 'relative',
-        'top': '900px'
-      });
-    });*/
 
     /**
      *
@@ -138,9 +110,11 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 
       //Make sure we're loaded.
       if(loadQueue < 1) {
+        var txtWidth;
+        
         ctxFront.save();
         ctxFront.font = 'bold 30px sans-serif';
-        var txtWidth = ctxFront.measureText('LOADING...').width;
+        txtWidth = ctxFront.measureText('LOADING...').width;
         ctxFront.fillText('LOADING...', cX / 2 - txtWidth / 2, cY / 2);
         ctxFront.restore();
         console.log('loadQueue', loadQueue);
@@ -150,6 +124,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       //update timer
 /*      console.log('time', time);
       console.log('stpFrame.start', stpFrame.start);*/
+//      stpFrame.update();
       stpFrame.elapsedMilliseconds = Date.now() - stpFrame.start;
 
       //Clear displayed text
@@ -163,6 +138,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
 	console.log(eventList[0].time, stpFrame.elapsedMilliseconds / 1000);
         if(eventList[0].time <= stpFrame.elapsedMilliseconds / 1000) {
           //Add all planes in this event.
+//          for(var index = 0, plane; plane = eventList[0].planes[i++]; ) {
           $.each(eventList[0].planes, function (index, plane) {
         	console.log('adding plane');
             addPlane(plane.type,
@@ -177,6 +153,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       }
 
       //Process object list
+      //for(var index = 0, obj; obj = objList[i++]; ) {
       $.each(objList, function (index, obj) {
         if(!objList[index])  return;
 
@@ -228,8 +205,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
         }
 
         //Collision detection
-        if(collisionDetection(index, obj))
-          return;
+        if(collisionDetection(index, obj)) { return; }
 
         //New position.
         var x = obj.pos.x + Math.round(obj.vx),
@@ -288,7 +264,7 @@ define(['coord','ball', 'hue', 'path', 'plane', 'action'], function (Coord, Ball
       });
 
       //Draw the map path if it has any points.
-      if(path4.length) path4.draw(ctxFront);
+      if(path4.length) { path4.draw(ctxFront); }
 
       //draw plane(s)
       $.each(objList, function(index, obj) {

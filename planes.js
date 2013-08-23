@@ -11,14 +11,15 @@ require.config({
 });
 
 require(['jquery', 'engine'], function($, Engine) {
-$(function() {
-  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-      window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-
-  window.requestAnimationFrame = requestAnimationFrame;
-
-  var engine = new Engine();
-      engine.home();
-
+  $(function() {
+    //RequestAnimationFrame shim
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame,
+        //
+        engine = new Engine();
+  
+    window.requestAnimationFrame = requestAnimationFrame;
+  
+    engine.home();
   });
 });
