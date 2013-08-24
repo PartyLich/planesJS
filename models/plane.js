@@ -38,13 +38,13 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
 
     //Init the masked composite image.
     this.initMask(alpha, img);
-    
+
     //Animation list
     this.animations = {};
     this.animations.crash = new Animation({
       firstFrame : 1,
       length : 1,
-      repeat : 6      
+      repeat : 6
     });
     this.animations.flight = new Animation({
       firstFrame : 1,
@@ -57,18 +57,18 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
       length : 8,
       repeat : -1
     });*/
-    
+
 //    this.curAnimation = this.animations.flight;
     this.setAnim(this.animations.flight);
-    
+
     this.frameX = 0;    //x location of current frame.
     this.frameY = 0;    //y location of current frame.
     this.cols = Math.floor(img.width / frameWidth);
     this.rows = Math.floor(img.height / frameHeight);
-    
+
     this.fCount = 0;    //number of times the current frame has been displayed.
 //    this.loop = 0;
-    
+
     this.crashing = false;
     this.dead = false;
   }
@@ -97,7 +97,7 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
   //    //print('Heading atan2(${vy}/${vx}): ${Math.atan2(vy, vx)}');
     return Math.atan2(this.vy, this.vx);
   };
-  
+
   /** Set this plane's current animation.
    * @param {Animation} animation The animation to use
    */
@@ -167,9 +167,9 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
 
     //console.log('Set velocity v:'+v+' angle:'+angle+' vx:'+vx+' vy:'+vy);
   };
-  
+
   /** Calculate the top left corner of the current frame.
-   * 
+   *
    */
   Plane.prototype.updateFrame = function () {
     this.frameX = (this.frame - 1) * this.width - (Math.floor((this.frame - 1) / this.cols) * this.cols * this.width);
@@ -198,7 +198,7 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
     //increment current frame draw counter
     this.fCount++;
 //    console.log('fCount', this.fCount);
-    
+
     //Save context state.
     ctx.save();
     //Rotate context to draw with proper heading.
@@ -228,33 +228,33 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
   ////    print("filling text");
   //    //ctx.fillText("(${pos.x.round()}, ${pos.y.round()})", pos.x - (pos.r/2).round(), pos.y);
     //ctx.fillText("(${pos.x.round()}, ${pos.y.round()})", pos.x - (pos.r/2).round(), pos.y);
-    
+
     //Advance animation frame.
     if(this.frame + 1 > this.curAnimation.firstFrame + this.curAnimation.length - 1) {
       //We've already hit the last frame in the animation. Check repeat
-console.log('End of current animation loop');      
+console.log('End of current animation loop');
       this.frame = this.curAnimation.firstFrame;
-      
+
       if(this.curAnimation.repeat === -1) {
         this.frame = this.curAnimation.firstFrame;
-      } else if(this.loop > 0) {        
+      } else if(this.loop > 0) {
         this.loop--;
       }
-      
+
       //Crash sequence complete?
       if(this.crashing) {
         console.log('Setting plane to DEAD');
         this.dead = true;
         return;
       }
-      
+
       //reset current frame draw counter
       this.fCount = 0;
     } else {
 //      console.log('this.curAnimation.fps', this.curAnimation.fps);
       if(this.fCount >= (60 / this.curAnimation.fps)) {  //check if we've repeated the current frame enough times
         this.frame++;
-        
+
         //reset current frame draw counter
         this.fCount = 0;
       }
@@ -277,18 +277,16 @@ console.log('End of current animation loop');
     //Restore context state.
     ctx.restore();
   };
-  
+
   /** Crashes this plane.
-   * 
+   *
    */
   Plane.prototype.crash = function () {
     console.log('Beginning crash sequence');
     //Uh, crash image/animation
     this.crashing = true;
-//    this.curAnimation = this.animations.crash;
     this.setAnim(this.animations.crash);
     console.log('Animation set to', this.curAnimation);
-//    this.frame = this.curAnimation.firstFrame;
     this.fCount = 0;
     this.updateFrame();
   };
@@ -327,7 +325,6 @@ console.log('End of current animation loop');
     //Combine image + mask on buffer.
     ctxBuf.globalCompositeOperation = 'xor';
     ctxBuf.drawImage(img, 0, 0);
-  ////    print('198: buffer filled.');
 
     //Save final image.
     this.img.src = buffer.toDataURL('image/png');
@@ -350,7 +347,6 @@ console.log('End of current animation loop');
     this.move(this.path[0]);
 
     this.heading = Math.atan2(runway[1].y - this.pos.y, runway[1].x - this.pos.x);
-  //    print('Set heading  vx:${vx} vy:${vy}. Dist(path0):${dist(path[0])}');
     console.log('Set heading  vx:' + this.vx + ' vy:' + this.vy + ' Dist(path0):' + this.dist(this.path[0]));
 
     this.landing = true;

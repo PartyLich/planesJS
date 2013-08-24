@@ -161,3 +161,9 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+/old
+/planesJS-master.7z
+/testBall.js
+/testPath.js
+/test.html
+/test.js

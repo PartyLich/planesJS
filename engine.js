@@ -1,5 +1,5 @@
-define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'mathLib'],
-function (require, Coord, Ball, Hue, Path, Plane, Action) {
+define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'StopWatch', 'mathLib'],
+function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
   var getRandom = require('mathLib').getRandom,
       getRandomInt = require('mathLib').getRandomInt;
 
@@ -13,10 +13,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
         drag = false,
         path4 = new Path(),
   //  Stopwatch stpWatch4, stpFrame
-        //stpFrame = new StopWatch(),
-        stpFrame = {},
-//        stpWatch4 = new StopWatch(),
-        stpWatch4 = {},
+        stpFrame = new StopWatch(),
+        stpWatch4 = new StopWatch(),
         bg = new Image(),
   //  Plane leer
   //      leer = null,
@@ -71,10 +69,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
 
       //
       frameCount = 0;
-  //    stpFrame.reset();
-      stpFrame.elapsedMilliseconds = 0;
-  //    stpFrame.start();
-      stpFrame.start = Date.now();
+      stpFrame.reset();
+      stpFrame.start();
 
       //Reset scoring.
       if(curLevel == 0) score = 0;
@@ -127,9 +123,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
 
       //update timer
 /*      console.log('time', time);
-      console.log('stpFrame.start', stpFrame.start);*/
-//      stpFrame.update();
-      stpFrame.elapsedMilliseconds = Date.now() - stpFrame.start;
+      console.log('stpFrame.startTime', stpFrame.startTime);*/
+      stpFrame.update();
 
       //Clear displayed text
   //    ctx4.clearRect(cX/2+100-5, 0, cX/2-95, 20); //top right diag text
@@ -288,7 +283,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
         //Empty the user drawn path
         path4.length = 0;
         //stop the game clock.
-  //      stpFrame.stop();
+        stpFrame.stop();
 
         //Remove canvas event listeners
         $(cvsFront).off('mousedown', mDown4)
@@ -301,6 +296,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
         window.requestAnimationFrame(gameTick);
       }
     }
+
 
     /** Display the home splash screen and such.
      */
@@ -352,6 +348,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
       $btnStart.one('click', startClick);
       $btnScore.one('click', scoreClick);
     }
+
 
     /** Loads the level specified by the [String] uri
      * @param {String} url
@@ -538,10 +535,11 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
 
     /** Canvas 4 mouseDown event handler for path drawing. */
     function mDown4Path(ev) {
+      var click = new Coord({x : ev.offsetX, y : ev.offsetY});
+
       //Toggle click n drag flag.
       drag = true;
       /*************************************************************************/
-      var click = new Coord({x : ev.offsetX, y : ev.offsetY});
 
       selected = null;
 
@@ -576,20 +574,19 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
         path4.clear();
 
         //Add start point to path.
-  //      path4.add(new Coord.init(ev.offsetX, ev.offsetY));
         path4.add(new Coord({x : ev.offsetX, y : ev.offsetY}));
       }
 
       //Start the stopwatch.
-  //    stpWatch4.start();
-      stpWatch4.start = Date.now();
-      stpWatch4.elapsedMilliseconds = 0;
+      stpWatch4.start();
     }
 
+
     /** Canvas 4 mouseMove event handler for path drawing. */
-    function  mMove4Path(ev) {
+    function mMove4Path(ev) {
       var next;
-      stpWatch4.elapsedMilliseconds = Date.now() - stpWatch4.start;
+
+      stpWatch4.update();
 
       if(drag && stpWatch4.elapsedMilliseconds > 6) {  //We're in the midst of a click n' drag.
         next = new Coord({x : ev.offsetX, y : ev.offsetY});
@@ -606,11 +603,10 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
         }
 
         //Reset the path stopwatch.
-  //      stpWatch4.reset();
-        stpWatch4.start = Date.now();
-        stpWatch4.elapsedMilliseconds = 0;
+        stpWatch4.reset();
       }
     }
+
 
     /** Canvas 4 mouseUp event handler for path drawing. */
     function mUp4Path(ev) {
@@ -618,10 +614,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
       drag = false;
 
       //Stop and reset the path stopwatch.
-  //    stpWatch4.stop();
-  //    stpWatch4.reset();
-      stpWatch4.start = Date.now();
-      stpWatch4.elapsedMilliseconds = 0;
+      stpWatch4.stop();
+      stpWatch4.reset();
 
       if(selected != null  && objList[selected].hasPath()) {
         //Add end point to specific path.
@@ -635,6 +629,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
   //      print('Path size: ${path4.length}');
       }
     }
+
 
     /** Start button event */
     function startClick(ev) {
@@ -658,6 +653,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
       run();
     }
 
+
     /** Score button event */
     function scoreClick(ev) {
       console.log('scoreClick');
@@ -677,6 +673,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
       //Show the score table
       loadScores('json/scores.json');
     }
+
 
     /** Home button event */
     function homeClick(ev) {
@@ -726,16 +723,19 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
      * @param {Number} heading
      */
     function addPlane(type, pos, heading) {
-        if(type == null)
+      if(type == null) {
           type = getRandomInt(0, imgPlanes.length);
+      }
 
-        pos || (pos = new Coord({x: getRandomInt(0, cX), y: getRandomInt(0, cY)}));
+      pos || (pos = new Coord({x: getRandomInt(0, cX), y: getRandomInt(0, cY)}));
 
-        if(heading == null)
-          heading = getRandom(0, 2 * Math.PI);
+      if(heading == null) {
+        heading = getRandom(0, 2 * Math.PI);
+      }
 
       try {
-        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha, imgPlanes[type].frameWidth, imgPlanes[type].frameHeight);
+        var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha,
+                      imgPlanes[type].frameWidth, imgPlanes[type].frameHeight);
 
         console.log(plane.animations.flight);
 
@@ -780,8 +780,9 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
     }
 
 
+    /** Initialize plane sprites
+     */
     function loadPlanes() {
-    //Initialize plane sprites
 
     //Open synchronous GET request.
       $.ajax('json/planes.json', {
@@ -827,13 +828,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
             else selected--;
           }
 
-          //Remove crashed planes.
-/*          console.log('objList.splice('+ i +', 1)');
-          objList.splice(i, 1);
-          console.log('objList.splice('+ index +', 1)');
-          objList.splice(index, 1);
-
-          i--;*/
 
           //Start crash sequences
           obj.crash();
@@ -841,6 +835,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
 
 
           //Scoring
+          //TODO: Broadcast score event to scoring system
           collisions++;
           score--;
 
@@ -864,6 +859,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action) {
 
       return imgTmp;
     }
+
 
     /** Increments the resource loaded counter so we know everything is ready. */
     function resourceLoad() {
