@@ -8,7 +8,9 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
    */
   function Engine() {
     var ctxFront, ctxBg,
-        cX, cY, frameCount = 0, score = 0, collisions = 0, selected = null, curLevel = 0,
+        cX, cY,
+        frameCount = 0, score = 0, collisions = 0,
+        selected = null, curLevel = 0,
         loadQueue = 1,
         drag = false,
         path4 = new Path(),
@@ -122,8 +124,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
       }
 
       //update timer
-/*      console.log('time', time);
-      console.log('stpFrame.startTime', stpFrame.startTime);*/
       stpFrame.update();
 
       //Clear displayed text
@@ -139,7 +139,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
           //Add all planes in this event.
 //          for(var index = 0, plane; plane = eventList[0].planes[i++]; ) {
           $.each(eventList[0].planes, function (index, plane) {
-        	console.log('adding plane');
+            console.log('adding plane');
             addPlane(plane.type,
                 new Coord({x: plane.location.x, y: plane.location.y}),
                 plane.heading);
@@ -211,10 +211,16 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
             y = obj.pos.y + Math.round(obj.vy);
 
         //boundary looping
-        if(x < -obj.pos.r) x = cX + obj.pos.r;
-        else if(x > cX + obj.pos.r) x = -obj.pos.r;
-        if(y > cY + obj.pos.r) y = -obj.pos.r;
-        else if(y < -obj.pos.r) y = cY + obj.pos.r;
+        if(x < -obj.pos.r) {
+          x = cX + obj.pos.r;
+        } else if(x > cX + obj.pos.r) {
+          x = -obj.pos.r;
+        }
+        if(y > cY + obj.pos.r) {
+          y = -obj.pos.r;
+        } else if(y < -obj.pos.r) {
+          y = cY + obj.pos.r;
+        }
 
         obj.move(new Coord({x: Math.round(x), y: Math.round(y)}));
         ctxFront.fillStyle = '#FF0000';
