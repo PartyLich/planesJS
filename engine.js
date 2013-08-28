@@ -377,7 +377,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
               runways.push(tmp);
             }
 
-          //Initialize event list.
+            //Initialize event list.
             $.each(result.events, function(index, event) {
               console.log('Adding event', event);
               eventList.push(new Action(event));
@@ -386,8 +386,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
             //Initialize background image.
             bg.src = '';
             bg.src = result.bg;
-
-            $(bg).one('load', function (ev) {
+            //Set the background image's load event to draw it on the canvas.
+            $(bg).one('load', /*function (ev) {
               console.log('BG loaded2');
               ctxBg.fillStyle = '#0000EE';
               ctxBg.fillRect(0, 0, cX, cY);
@@ -417,10 +417,54 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
                 ctxBg.fillStyle = '#FF0000';
                 new Ball(runway[1].x, runway[1].y, 3).draw(ctxBg);
               });
-            });
+            }*/
+            drawBg);
           }
         });
       }
+
+    /** Callback function to draw an image to the background canvas on image
+     *  load.
+     */
+    function drawBg() {
+      var bg = this,
+          width, height,
+          x, y,
+          runway;
+
+      console.log('this:', this);
+      console.log('BG loaded2');
+      ctxBg.fillStyle = '#0000EE';
+      ctxBg.fillRect(0, 0, cX, cY);
+
+      //Draw background image on the background canvas.
+      ctxBg.save();
+
+      //Rotate the image 90deg.
+      //ctxBg.translate((cX-80), (-80));
+//      ctxBg.translate(820, -80);
+//      ctxBg.translate(820, 0);
+//      ctxBg.rotate(Math.PI / 2);
+
+//      ctxBg.drawImage(bg, 0, 0, 400, 800);
+      width = bg.width/2;
+      height = bg.height/2;
+      x = (cX - width) / 2;
+      y = (cY - height) / 2;
+
+      ctxBg.drawImage(bg, x, y, Math.round(width), Math.round(height));
+      ctxBg.restore();
+      ctxBg.font = 'normal 9px sans-serif';
+
+      //
+      for(i = 0, runway = null; runway = runways[i++]; ) {
+        ctxBg.fillStyle = '#00FF00';
+        new Ball(runway[0].x, runway[0].y, 3).draw(ctxBg);
+        ctxBg.fillStyle = '#FF0000';
+        new Ball(runway[1].x, runway[1].y, 3).draw(ctxBg);
+      }
+    }
+
 
     /** Loads the scores list specified by the [String] url.
      * @param {String} url
@@ -599,8 +643,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
 
         if(selected == null) {
           //Add intermediate point to path
-          if(path4.last().dist(next) > 5)
-            path4.add(next);
+          if(path4.last().dist(next) > 5) { path4.add(next); }
         } else if(objList[selected].hasPath()) {
           if(objList[selected].path.last().dist(next) > 5) {
             //Add intermediate point to path
