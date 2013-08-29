@@ -1,6 +1,7 @@
-define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'StopWatch', 'mathLib'
+define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'StopWatch', 'Mediator',
+        'mathLib'
         , 'text!tmpl/table.jshaml', 'text!tmpl/startButton.jshaml'],
-function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
+function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
   var getRandom = require('mathLib').getRandom,
       getRandomInt = require('mathLib').getRandomInt;
 
@@ -30,6 +31,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
         eventList = [],
     //  runways = new List<Path>()
         runways = [],
+        mediator = new Mediator(),
     //templates
         tmplTable = Haml( require('text!tmpl/table.jshaml'),
                       {customEscape: "Haml.html_escape"});
@@ -49,17 +51,34 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
     loadPlanes();
 
     //Initialize level list
-    levels.push('json/lvl1.json');
-    levels.push('json/lvl2.json');
-    levels.push('json/lvl3.json');
-    levels.push('json/lvl4.json');
-    levels.push('json/lvl5.json');
-    levels.push('json/lvl6.json');
-    levels.push('json/lvl7.json');
+    levels.push(
+      'json/lvl1.json',
+      'json/lvl2.json',
+      'json/lvl3.json',
+      'json/lvl4.json',
+      'json/lvl5.json',
+      'json/lvl6.json',
+      'json/lvl7.json'
+    );
+    
+    //Install mediator
+    mediator.installTo(this);
+    //test mediator
+    var bs2 = function (args) {
+      console.log('another bsEvent subscription!', args);
+      console.log(args[2]);
+    };
+    this.subscribe('bsEvent', function (val) {
+      console.log('bsEvent!', val, val.length, typeof val);
+    });
+    this.subscribe('bsEvent', bs2);
+    this.publish('bsEvent', 'Thing one', 'Thing two', {rumble: 'thing three'});
+    mediator.unsub('bsEvent', bs2);
+    this.publish('bsEvent', 'Thing one', 'Thing two', {rumble: 'thing three'});
 
 
     //Add plane button
-    $('btnAdd').click( function (ev) {
+    $('btnAdd').click(function (ev) {
       addPlane();
     });
 
@@ -133,24 +152,22 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
       stpFrame.update();
 
       //Clear displayed text
-  //    ctx4.clearRect(cX/2+100-5, 0, cX/2-95, 20); //top right diag text
       ctxFront.clearRect(0, 0, 250, 20);              //top left diag text
       ctxFront.clearRect(0, cY-35, 150, 20);          //score
 
       //Process current event list item
-//      console.log('eventList.length', eventList.length);
       if(eventList.length) {
-	console.log(eventList[0].time, stpFrame.elapsedMilliseconds / 1000);
         if(eventList[0].time <= stpFrame.elapsedMilliseconds / 1000) {
           //Add all planes in this event.
-//          for(var index = 0, plane; plane = eventList[0].planes[i++]; ) {
-          $.each(eventList[0].planes, function (index, plane) {
+          for(var index = 0, plane; plane = eventList[0].planes[index++]; ) {
+//          $.each(eventList[0].planes, function (index, plane) {
             console.log('adding plane');
             addPlane(plane.type,
                 new Coord({x: plane.location.x, y: plane.location.y}),
                 plane.heading);
             console.log('plane.heading', plane.heading);
-          });
+//          });
+          }
 
           //Remove this event from the list.
           eventList.shift();
@@ -442,7 +459,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
      * @param {String} url
      */
     function loadScores(url) {
-      var table, header, score;
+      var table;
         
       //TODO: make this a synchronous request.
       //Open asynchronous GET request.

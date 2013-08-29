@@ -8,6 +8,7 @@ require.config({
     'jquery' : 'lib/jquery-1.8.2.min',
     'haml': 'lib/haml',
     'mathLib': 'lib/mathLib',
+    'Mediator': 'lib/mediator',
     
     'action': 'models/action',
     'animation': 'models/animation',
