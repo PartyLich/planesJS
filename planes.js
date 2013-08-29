@@ -6,6 +6,9 @@ require.config({
   paths: {  //Configure library/module paths.
     /*'jquery' : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',*/
     'jquery' : 'lib/jquery-1.8.2.min',
+    'haml': 'lib/haml',
+    'mathLib': 'lib/mathLib',
+    
     'action': 'models/action',
     'animation': 'models/animation',
     'ball': 'models/ball',
@@ -14,12 +17,14 @@ require.config({
     'path': 'models/path',
     'plane': 'models/plane',
     'StopWatch': 'models/StopWatch',
-    'mathLib': 'lib/mathLib'
-//    'underscore' : 'lib/underscore-min',
+  },
+  //Shim config FTW: http://requirejs.org/docs/api.html#config-shim
+  shim: {
+    'haml': { exports: 'Haml' }
   }
 });
 
-require(['jquery', 'engine'], function($, Engine) {
+require(['jquery', 'haml', 'engine'], function($, Haml, Engine) {
   $(function() {
     //RequestAnimationFrame shim
     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||

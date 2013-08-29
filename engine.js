@@ -1,4 +1,5 @@
-define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'StopWatch', 'mathLib'],
+define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'StopWatch', 'mathLib'
+        , 'text!tmpl/table.jshaml', 'text!tmpl/startButton.jshaml'],
 function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
   var getRandom = require('mathLib').getRandom,
       getRandomInt = require('mathLib').getRandomInt;
@@ -28,9 +29,14 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
     //  eventList = new List<Action>()
         eventList = [],
     //  runways = new List<Path>()
-        runways = [];
+        runways = [],
+    //templates
+        tmplTable = Haml( require('text!tmpl/table.jshaml'),
+                      {customEscape: "Haml.html_escape"});
+        tmplStartBtn = Haml( require('text!tmpl/startButton.jshaml'),
+                         {customEscape: "Haml.html_escape"});
 
-
+    
     //Get canvas contexts.
     ctxFront = cvsFront.getContext("2d");
     ctxFront.font = 'normal 12px sans-serif';
@@ -312,13 +318,11 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
 
       //Create nav buttons if they don't already exist.
       if(!$btnStart.length) {
-        $btnStart = $('<button id="btnStart"></button>').text('START');
-
+        $btnStart = $( tmplStartBtn({id: 'btnStart', text: 'START'}) );
         $('body').append($btnStart);
       }
       if(!$btnScore.length) {
-        $btnScore = $('<button id="btnScore"></button>').text('SCORES');
-
+        $btnScore = $( tmplStartBtn({id: 'btnScore', text: 'SCORE'}) );
         $('body').append($btnScore);
       }
 
@@ -387,38 +391,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
             bg.src = '';
             bg.src = result.bg;
             //Set the background image's load event to draw it on the canvas.
-            $(bg).one('load', /*function (ev) {
-              console.log('BG loaded2');
-              ctxBg.fillStyle = '#0000EE';
-              ctxBg.fillRect(0, 0, cX, cY);
-
-              //Draw background image on the background canvas.
-              ctxBg.save();
-
-              //Rotate the image 90deg.
-              //ctxBg.translate((cX-80), (-80));
-//              ctxBg.translate(820, -80);
-//              ctxBg.translate(820, 0);
-//              ctxBg.rotate(Math.PI / 2);
-
-//              ctxBg.drawImage(bg, 0, 0, 400, 800);
-              var width = bg.width/2,
-                  height = bg.height/2,
-                  x = (cX - width) / 2,
-                  y = (cY - height) / 2;
-              ctxBg.drawImage(bg, x, y, Math.round(width), Math.round(height));
-              ctxBg.restore();
-              ctxBg.font = 'normal 9px sans-serif';
-
-              //
-              $.each(runways, function (index, runway) {
-                ctxBg.fillStyle = '#00FF00';
-                new Ball(runway[0].x, runway[0].y, 3).draw(ctxBg);
-                ctxBg.fillStyle = '#FF0000';
-                new Ball(runway[1].x, runway[1].y, 3).draw(ctxBg);
-              });
-            }*/
-            drawBg);
+            $(bg).one('load', drawBg);
           }
         });
       }
@@ -446,7 +419,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
 //      ctxBg.translate(820, 0);
 //      ctxBg.rotate(Math.PI / 2);
 
-//      ctxBg.drawImage(bg, 0, 0, 400, 800);
       width = bg.width/2;
       height = bg.height/2;
       x = (cX - width) / 2;
@@ -469,49 +441,30 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
     /** Loads the scores list specified by the [String] url.
      * @param {String} url
      */
-      function loadScores(url) {
-        var table, header, score;
-        //TODO: make this a synchronous request.
-        //Open asynchronous GET request.
-        $.getJSON(url, function (result) {
-          table = $('#scoreTable');
+    function loadScores(url) {
+      var table, header, score;
+        
+      //TODO: make this a synchronous request.
+      //Open asynchronous GET request.
+      $.getJSON(url, function (result) {
+        table = $('#scoreTable');
 
-          //Create the table if it doesnt exist.
-          if(!table.length) {
-            table = $('<table id="scoreTable"></table>');
-            //Add table to doc
-            $('body').append(table);
-          } else {  table.empty(); }
+        //Create the table if it doesnt exist.
+        if(!table.length) {
+          table = $( tmplTable({scores: result.scores}) );
+          //Add table to doc
+          $('body').append(table);
+        } else { table.html( tmplTable({scores: result.scores}) ); }
 
-          //Table header row
-          header = $('<tr></tr>')
-              .append('<th>Name</th>')
-              .append('<th>Date</th>')
-              .append('<th>Level</th>')
-              .append('<th>Score</th>');
+        //TODO: just give it a canvas sized div and center the darn thing
+        table.css({
+          'position' : 'absolute',
+          'top' : $(cvsFront).height() * .35 + 'px',
+          'left' : $(cvsFront).width() *.25 + 'px',
+          'z-index' : '2'
+        });
 
-          table.append(header);
-
-          //Score row(s)
-          $.each(result.scores, function(index, row) {
-            score = $('<tr></tr>')
-              .append('<td>' + row.name + '</td>')
-              .append('<td>' + row.date + '</td>')
-              .append('<td>' + row.level + '</td>')
-              .append('<td>' + row.score + '</td>');
-
-            table.append(score);
-          });
-
-          //TODO: just give it a canvas sized div and center the darn thing
-          table.css({
-              'position' : 'absolute',
-              'top' : $(cvsFront).height() * .35 + 'px',
-              'left' : $(cvsFront).width() *.25 + 'px',
-              'z-index' : '2'
-          });
-
-          table.show();
+        table.show();
       });
     }
 
@@ -589,7 +542,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
 
       //Toggle click n drag flag.
       drag = true;
-      /*************************************************************************/
 
       selected = null;
 
@@ -614,7 +566,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
           }
         }
       });
-      /*************************************************************************/
 
       if(selected != null) {  //A specific plane is selected
 
@@ -773,7 +724,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
      */
     function addPlane(type, pos, heading) {
       if(type == null) {
-          type = getRandomInt(0, imgPlanes.length);
+        type = getRandomInt(0, imgPlanes.length);
       }
 
       pos || (pos = new Coord({x: getRandomInt(0, cX), y: getRandomInt(0, cY)}));
@@ -788,7 +739,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
 
         console.log(plane.animations.flight);
 
-        if(type == 1) {
+        if(type === 1) {
           plane.animations.flight.firstFrame = 1;
           plane.animations.flight.length = 8;
           plane.animations.flight.repeat = -1;
@@ -832,8 +783,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
     /** Initialize plane sprites
      */
     function loadPlanes() {
-
-    //Open synchronous GET request.
+      //Open synchronous GET request.
       $.ajax('json/planes.json', {
         async : false,
         dataType : 'json',
@@ -851,7 +801,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
           });
         }
       });
-    } //End of function loadPlanes()
+    }
 
 
     /**
@@ -860,7 +810,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
      * @returns {Boolean} True if collision detected.
      */
     function collisionDetection(index, obj) {
-    //Collision detection
+      //Collision detection
       for(var i = index+1; i < objList.length; i++) {
   //      console.log('i='+ i, ' obj.dist(objList['+i+'].pos)='+ obj.dist(objList[i].pos)
   //          +' max(r=)'+ Math.max(obj.pos.r, objList[i].pos.r));
@@ -915,9 +865,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch) {
       loadQueue++;
       console.log('Resource loaded:', this, 'complete: ', this.complete);
     }
-
-
-
 
 
 
