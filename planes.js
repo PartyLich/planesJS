@@ -7,9 +7,12 @@ require.config({
     /*'jquery' : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',*/
     'jquery' : 'lib/jquery-1.8.2.min',
     'haml': 'lib/haml',
+
     'mathLib': 'lib/mathLib',
     'Mediator': 'lib/mediator',
-    
+    'Graphics': 'lib/graphics',
+    'Physics': 'lib/physics',
+
     'action': 'models/action',
     'animation': 'models/animation',
     'ball': 'models/ball',

@@ -1,7 +1,7 @@
-define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'StopWatch', 'Mediator',
-        'mathLib'
-        , 'text!tmpl/table.jshaml', 'text!tmpl/startButton.jshaml'],
-function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
+define(['require','coord','ball', 'hue', 'path', 'plane', 'action', 'StopWatch',
+        'Mediator', 'Graphics', 'Physics', 'mathLib',
+        'text!tmpl/table.jshaml', 'text!tmpl/startButton.jshaml'],
+function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, Graphics, Physics) {
   var getRandom = require('mathLib').getRandom,
       getRandomInt = require('mathLib').getRandomInt;
 
@@ -31,14 +31,18 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
         eventList = [],
     //  runways = new List<Path>()
         runways = [],
+
         mediator = new Mediator(),
+        graphics = new Graphics(mediator),
+
+
     //templates
         tmplTable = Haml( require('text!tmpl/table.jshaml'),
                       {customEscape: "Haml.html_escape"});
         tmplStartBtn = Haml( require('text!tmpl/startButton.jshaml'),
                          {customEscape: "Haml.html_escape"});
 
-    
+
     //Get canvas contexts.
     ctxFront = cvsFront.getContext("2d");
     ctxFront.font = 'normal 12px sans-serif';
@@ -60,7 +64,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
       'json/lvl6.json',
       'json/lvl7.json'
     );
-    
+
     //Install mediator
     mediator.installTo(this);
     //test mediator
@@ -152,7 +156,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
 
       //Clear displayed text
       ctxFront.clearRect(0, 0, 250, 20);              //top left diag text
-      ctxFront.clearRect(0, cY-35, 150, 20);          //score
+      ctxFront.clearRect(0, cY - 35, 150, 20);          //score
 
       //Process current event list item
       if(eventList.length) {
@@ -180,6 +184,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
 
         //Erase the foreground canvas.
         obj.clear(ctxFront);
+        //this.publish('g:clearObj', obj, ctxFront);
 
         //remove dead planes
         console.log('obj.dead', obj.dead);
@@ -211,6 +216,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
 
           //Increase player's score.
           score++;
+          /*this.*/publish('score:land');
 
           //add a new, random plane.
           //addPlane();
@@ -229,7 +235,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
         if(collisionDetection(index, obj)) { return; }
 
         //New position.
-        var x = obj.pos.x + Math.round(obj.vx),
+        /*var x = obj.pos.x + Math.round(obj.vx),
             y = obj.pos.y + Math.round(obj.vy);
 
         //boundary looping
@@ -244,7 +250,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
           y = cY + obj.pos.r;
         }
 
-        obj.move(new Coord({x: Math.round(x), y: Math.round(y)}));
+        obj.move(new Coord({x: Math.round(x), y: Math.round(y)}));*/
+        reposition(obj);
         ctxFront.fillStyle = '#FF0000';
 
         //Path stuff.
@@ -261,6 +268,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
         if(obj.hasPath()) {
           var waypoint = obj.waypoint;
 
+          //TODO: broadcast graphics message
           obj.path.undraw(ctxFront);
           obj.path.draw(ctxFront);
 
@@ -271,11 +279,13 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
             obj.path = null;
 
             //Check for runway proximity
-            $.each(runways, function(index, runway) {
+            for(var index = 0, runway; runway = runways[index]; index++) {
+//            $.each(runways, function(index, runway) {
               if(obj.dist(runway[0]) <= obj.pos.r) {
                 obj.land(runway);
               }
-            });
+//            });
+            }
           } else {
             //Redirect the plane.
             var head = Math.atan2(obj.path[waypoint].y - obj.pos.y, obj.path[waypoint].x - obj.pos.x);
@@ -283,7 +293,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
             console.log('Adjusting heading to '+ head * 180/Math.PI +'deg.');
             obj.setHeading(head);
 
-            if(obj.dist(obj.path[waypoint]) <= obj.pos.r * .75) { //We're near the waypoint. Great job!
+            if(obj.dist(obj.path[waypoint]) <= obj.pos.r * .75) {
+            //We're near the waypoint. Great job!
               obj.nextWaypoint();
             }
           }
@@ -291,12 +302,15 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
       });
 
       //Draw the map path if it has any points.
+      //TODO: broadcast graphics message
       if(path4.length) { path4.draw(ctxFront); }
 
       //Draw plane(s) all objects.
+//      for(var index = 0, obj; obj = objList[i]; i++) {
       $.each(objList, function(index, obj) {
         obj.draw(ctxFront);
       });
+//      }
 
       //Framerate
       frameCount++;
@@ -320,10 +334,38 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
                    .off('mousemove', mMove4Path)
                    .off('mouseup', mUp4Path);
 
+        //TODO: broadcast level end message
+        publish('sys:levelEnd');
         levelEnd();       //inter level transition screen
       } else {
         window.requestAnimationFrame(gameTick);
       }
+    }
+
+
+    /** Reposition an object according to its current velocity.
+     * @param {Object} obj An object with a position and velocity
+     */
+    function reposition(obj) {
+      //New position.
+      var x = obj.pos.x + Math.round(obj.vx),
+          y = obj.pos.y + Math.round(obj.vy);
+
+      //boundary looping
+      if(x < -obj.pos.r) {
+        x = cX + obj.pos.r;
+      } else if(x > cX + obj.pos.r) {
+        x = -obj.pos.r;
+      }
+      if(y > cY + obj.pos.r) {
+        y = -obj.pos.r;
+      } else if(y < -obj.pos.r) {
+        y = cY + obj.pos.r;
+      }
+
+      obj.move(new Coord({x: Math.round(x), y: Math.round(y)}));
+
+      return obj;
     }
 
 
@@ -460,7 +502,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
      */
     function loadScores(url) {
       var table;
-        
+
       //TODO: make this a synchronous request.
       //Open asynchronous GET request.
       $.getJSON(url, function (result) {
