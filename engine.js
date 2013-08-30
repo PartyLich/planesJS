@@ -111,8 +111,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
       });
 
       //Register some event handlers!
-      $(cvsFront).mousedown(mDown4)
-                 .mousedown(mDown4Path)
+      $(cvsFront).mousedown(mDown)
+                 .mousedown(mDownPath)
                  .mousemove(mMove4Path)
                  .mouseup(mUp4Path);
 
@@ -130,11 +130,10 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
     }
 
 
-    /**
+    /** Main game loop
      * @param {Number} time  When this animation frame is scheduled to run.
      */
     function gameTick(time) {
-
       //Make sure we're loaded.
       if(loadQueue < 1) {
         var txtWidth;
@@ -177,7 +176,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
       //Process object list
       //for(var index = 0, obj; obj = objList[i++]; ) {
       $.each(objList, function (index, obj) {
-        if(!objList[index])  return;
+        if(!objList[index]) { return; }
 
         //Erase the foreground canvas.
         obj.clear(ctxFront);
@@ -185,14 +184,14 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
         //remove dead planes
         console.log('obj.dead', obj.dead);
         if(obj.dead) {
-          if(obj.selected) selected = null;
+          if(obj.selected) { selected = null; }
 
           console.log('objList.splice('+ index +', 1)');
           objList.splice(index, 1);
 
           //Update selected index
           if(selected != null) {
-            if(selected >= index) selected--;
+            if(selected >= index) { selected--; }
           }
 
           return;
@@ -218,7 +217,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
           //continue;
           return;
         } else if(obj.landing) {
-        //update plane location(s).
+          //update plane location(s).
         // TODO: Integer movement only!?
           //Accelerate landing plane.
           obj.setVelocity(obj.velocity() + obj.a);
@@ -258,6 +257,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
             //obj.waypoint = 1;
           }
         }
+
         if(obj.hasPath()) {
           var waypoint = obj.waypoint;
 
@@ -284,7 +284,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
             obj.setHeading(head);
 
             if(obj.dist(obj.path[waypoint]) <= obj.pos.r * .75) { //We're near the waypoint. Great job!
-              //obj.waypoint++;
               obj.nextWaypoint();
             }
           }
@@ -294,20 +293,21 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
       //Draw the map path if it has any points.
       if(path4.length) { path4.draw(ctxFront); }
 
-      //draw plane(s)
+      //Draw plane(s) all objects.
       $.each(objList, function(index, obj) {
         obj.draw(ctxFront);
       });
 
       //Framerate
       frameCount++;
-      ctxFront.fillText('Framerate: '+ Math.round(frameCount/(stpFrame.elapsedMilliseconds/1000)) +'    Time:'+(stpFrame.elapsedMilliseconds/1000), 5, 10);
+      ctxFront.fillText('Framerate: '+ Math.round(frameCount / (stpFrame.elapsedMilliseconds / 1000))
+          +'    Time:'+(stpFrame.elapsedMilliseconds / 1000), 5, 10);
 
       //Display current score.
-      ctxFront.fillText('Score: '+ score +'\r\nCollisions: ' + collisions, 5, cY-25);
+      ctxFront.fillText('Score: '+ score +'\r\nCollisions: ' + collisions, 5, cY - 25);
 
       //Request the next animation frame or end the game.
-      if(objList.length == 0 && eventList.length == 0) {
+      if(objList.length === 0 && eventList.length === 0) {
         console.log('Ending game loop.');
         //Empty the user drawn path
         path4.length = 0;
@@ -315,8 +315,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
         stpFrame.stop();
 
         //Remove canvas event listeners
-        $(cvsFront).off('mousedown', mDown4)
-                   .off('mousedown', mDown4Path)
+        $(cvsFront).off('mousedown', mDown)
+                   .off('mousedown', mDownPath)
                    .off('mousemove', mMove4Path)
                    .off('mouseup', mUp4Path);
 
@@ -544,7 +544,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
     }
 
     /** Canvas4 mouseDown event handler. Directs leer object toward the click */
-    function mDown4(ev) {
+    function mDown(ev) {
       //Redirect the plane
       /*
       var head = Math.atan2(ev.offsetY - leer.pos.y, ev.offsetX - leer.pos.x);
@@ -554,7 +554,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
     }
 
     /** Canvas 4 mouseDown event handler for path drawing. */
-    function mDown4Path(ev) {
+    function mDownPath(ev) {
       var click = new Coord({x : ev.offsetX, y : ev.offsetY});
 
       //Toggle click n drag flag.
@@ -821,7 +821,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator) {
     }
 
 
-    /**
+    /** Collision detection
      * @param {Number} index  Objectlist index.
      * @param {Plane} obj   Plane referenced by index.
      * @returns {Boolean} True if collision detected.
