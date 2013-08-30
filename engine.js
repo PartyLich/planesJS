@@ -10,7 +10,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
    */
   function Engine() {
     var ctxFront, ctxBg,
-        cX, cY,
         frameCount = 0, score = 0, collisions = 0,
         selected = null, curLevel = 0,
         loadQueue = 1,
@@ -24,6 +23,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
   //      leer = null,
   //  CanvasElement cvs4, cvsBg;
         cvsFront = $('#cvsFront')[0], cvsBg = $('#cvsBg')[0],
+        cX = cvsFront.width,
+        cY = cvsFront.height,
         objList = [], levels = [],
     //  imgPlanes = new List<ImageElement>()
         imgPlanes = [],
@@ -270,6 +271,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
 
           //TODO: broadcast graphics message
           obj.path.undraw(ctxFront);
+          //mediator.publish('g:drawObject', obj.path, ctxFront);
           obj.path.draw(ctxFront);
 
           if(waypoint >= obj.path.length) {  //Path complete.
@@ -302,12 +304,17 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       });
 
       //Draw the map path if it has any points.
-      //TODO: broadcast graphics message
-      if(path4.length) { path4.draw(ctxFront); }
+      if(path4.length) {
+        //TODO: broadcast graphics message
+        //mediator.publish('g:drawObject', path4, ctxFront);
+        path4.draw(ctxFront); 
+      }
 
       //Draw plane(s) all objects.
 //      for(var index = 0, obj; obj = objList[i]; i++) {
       $.each(objList, function(index, obj) {
+        //TODO: broadcast graphics message
+        //mediator.publish('g:drawObject', obj, ctxFront);
         obj.draw(ctxFront);
       });
 //      }
@@ -450,11 +457,25 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
             bg.src = '';
             bg.src = result.bg;
             //Set the background image's load event to draw it on the canvas.
-            $(bg).one('load', drawBg);
+            console.log('cX', cX);
+            $(bg).one('load', drawBg2);
+//            $(bg).one('load', drawBg);
           }
         });
       }
 
+    function drawBg2() {
+      mediator.publish('g:drawBg', this, ctxBg, cX, cY);
+      
+      //
+      for(i = 0, runway = null; runway = runways[i++]; ) {
+        ctxBg.fillStyle = '#00FF00';
+        new Ball(runway[0].x, runway[0].y, 3).draw(ctxBg);
+        ctxBg.fillStyle = '#FF0000';
+        new Ball(runway[1].x, runway[1].y, 3).draw(ctxBg);
+      }
+    }
+      
     /** Callback function to draw an image to the background canvas on image
      *  load.
      */
