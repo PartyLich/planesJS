@@ -205,19 +205,19 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
 
         //remove landed planes
         if(obj.landing && Math.round(obj.velocity()) <= 0) {
-            if(obj.selected) selected = null;
+          if(obj.selected) { selected = null; }
 
             console.log('objList.splice('+ index +', 1)');
             objList.splice(index, 1);
 
           //Update selected index
           if(selected != null) {
-            if(selected >= index) selected--;
+            if(selected >= index) { selected--; }
           }
 
           //Increase player's score.
           score++;
-          /*this.*/publish('score:land');
+          mediator.publish('score:land');
 
           //add a new, random plane.
           //addPlane();
@@ -235,23 +235,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
         //Collision detection
         if(collisionDetection(index, obj)) { return; }
 
-        //New position.
-        /*var x = obj.pos.x + Math.round(obj.vx),
-            y = obj.pos.y + Math.round(obj.vy);
-
-        //boundary looping
-        if(x < -obj.pos.r) {
-          x = cX + obj.pos.r;
-        } else if(x > cX + obj.pos.r) {
-          x = -obj.pos.r;
-        }
-        if(y > cY + obj.pos.r) {
-          y = -obj.pos.r;
-        } else if(y < -obj.pos.r) {
-          y = cY + obj.pos.r;
-        }
-
-        obj.move(new Coord({x: Math.round(x), y: Math.round(y)}));*/
+        //New position and boundary looping
         reposition(obj);
         ctxFront.fillStyle = '#FF0000';
 
@@ -342,7 +326,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
                    .off('mouseup', mUp4Path);
 
         //TODO: broadcast level end message
-        publish('sys:levelEnd');
+        mediator.publish('sys:levelEnd');
         levelEnd();       //inter level transition screen
       } else {
         window.requestAnimationFrame(gameTick);
