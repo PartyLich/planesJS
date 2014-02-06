@@ -458,56 +458,19 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
             bg.src = result.bg;
             //Set the background image's load event to draw it on the canvas.
             console.log('cX', cX);
-            $(bg).one('load', drawBg2);
+            $(bg).one('load', drawBg);
 //            $(bg).one('load', drawBg);
           }
         });
       }
 
-    function drawBg2() {
-      mediator.publish('g:drawBg', this, ctxBg, cX, cY);
-      
-      //
-      for(i = 0, runway = null; runway = runways[i++]; ) {
-        ctxBg.fillStyle = '#00FF00';
-        new Ball(runway[0].x, runway[0].y, 3).draw(ctxBg);
-        ctxBg.fillStyle = '#FF0000';
-        new Ball(runway[1].x, runway[1].y, 3).draw(ctxBg);
-      }
-    }
       
     /** Callback function to draw an image to the background canvas on image
      *  load.
      */
     function drawBg() {
-      var bg = this,
-          width, height,
-          x, y,
-          runway;
-
-      console.log('this:', this);
-      console.log('BG loaded2');
-      ctxBg.fillStyle = '#0000EE';
-      ctxBg.fillRect(0, 0, cX, cY);
-
-      //Draw background image on the background canvas.
-      ctxBg.save();
-
-      //Rotate the image 90deg.
-      //ctxBg.translate((cX-80), (-80));
-//      ctxBg.translate(820, -80);
-//      ctxBg.translate(820, 0);
-//      ctxBg.rotate(Math.PI / 2);
-
-      width = bg.width/2;
-      height = bg.height/2;
-      x = (cX - width) / 2;
-      y = (cY - height) / 2;
-
-      ctxBg.drawImage(bg, x, y, Math.round(width), Math.round(height));
-      ctxBg.restore();
-      ctxBg.font = 'normal 9px sans-serif';
-
+      mediator.publish('g:drawBg', this, ctxBg, cX, cY);
+      
       //
       for(i = 0, runway = null; runway = runways[i++]; ) {
         ctxBg.fillStyle = '#00FF00';
@@ -562,6 +525,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
         $('#dialog-modal').dialog('open');
       }, 'JSON');
     }
+    
 
     /** Inter-level transition screen. Re-uses home screen nav buttons */
     function levelEnd() {
@@ -605,6 +569,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       btnHome.one('click', homeClick);
       btnNext.one('click', nextClick);
     }
+    
 
     /** Canvas4 mouseDown event handler. Directs leer object toward the click */
     function mDown(ev) {
@@ -864,21 +829,36 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
      */
     function loadPlanes() {
       //Open synchronous GET request.
-      $.ajax('json/planes.json', {
-        async : false,
-        dataType : 'json',
-        success : function(result) {
-          //Initialize plane list.
-          $.each(result.planes, function(index, plane) {
-            console.log('Adding plane', plane);
-
-            imgPlanes.push({
-              img : loadImage(plane.img),
-              alpha : loadImage(plane.alpha),
-              frameWidth : plane.frameWidth,
-              frameHeight : plane.frameHeight
-            });
+//      $.ajax('json/planes.json', {
+//        async : false,
+//        dataType : 'json',
+//        success : function(result) {
+//          //Initialize plane list.
+//          $.each(result.planes, function(index, plane) {
+//            console.log('Adding plane', plane);
+//
+//            imgPlanes.push({
+//              img : loadImage(plane.img),
+//              alpha : loadImage(plane.alpha),
+//              frameWidth : plane.frameWidth,
+//              frameHeight : plane.frameHeight
+//            });
+//          });
+//        }
+//      });
+      syncGetJson('json/planes.json', function (result) {
+        //Initialize plane list.
+//        $.each(result.planes, function(index, plane) {
+        for(var index = 0, plane; plane = result.planes[index]; index++) {
+          console.log('Adding plane', plane);
+          
+          imgPlanes.push({
+            img : loadImage(plane.img),
+            alpha : loadImage(plane.alpha),
+            frameWidth : plane.frameWidth,
+            frameHeight : plane.frameHeight
           });
+//        });
         }
       });
     }
@@ -944,6 +924,20 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
     function resourceLoad() {
       loadQueue++;
       console.log('Resource loaded:', this, 'complete: ', this.complete);
+    }
+    
+    
+    function syncGetJson(url, callback) {
+      $.ajax(url, {
+        async : false,
+        dataType : 'json',
+        success : callback
+      });
+    }
+    
+    
+    function aSyncGetJson(url, callback) {
+      
     }
 
 
