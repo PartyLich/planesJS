@@ -1,7 +1,6 @@
 /**
  *
  */
-
 require.config({
   paths: {  //Configure library/module paths.
     /*'jquery' : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',*/
@@ -27,6 +26,7 @@ require.config({
     'haml': { exports: 'Haml' }
   }
 });
+
 
 require(['jquery', 'haml', 'engine'], function($, Haml, Engine) {
   $(function() {
