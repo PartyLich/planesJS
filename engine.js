@@ -35,6 +35,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
 
         mediator = new Mediator(),
         graphics = new Graphics(mediator),
+        physics = new Physics(mediator),
 
 
     //templates
@@ -140,15 +141,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
      */
     function gameTick(time) {
       //Make sure we're loaded.
-      if(loadQueue < 1) {
-        var txtWidth;
-
-        ctxFront.save();
-        ctxFront.font = 'bold 30px sans-serif';
-        txtWidth = ctxFront.measureText('LOADING...').width;
-        ctxFront.fillText('LOADING...', cX / 2 - txtWidth / 2, cY / 2);
-        ctxFront.restore();
-        console.log('loadQueue', loadQueue);
+      if(stillLoading()) {
         return;
       }
 
@@ -160,32 +153,31 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       ctxFront.clearRect(0, cY - 35, 150, 20);          //score
 
       //Process current event list item
-      if(eventList.length) {
+      /*if(eventList.length) {
         if(eventList[0].time <= stpFrame.elapsedMilliseconds / 1000) {
           //Add all planes in this event.
           for(var index = 0, plane; plane = eventList[0].planes[index++]; ) {
-//          $.each(eventList[0].planes, function (index, plane) {
             console.log('adding plane');
             addPlane(plane.type,
                 new Coord({x: plane.location.x, y: plane.location.y}),
                 plane.heading);
             console.log('plane.heading', plane.heading);
-//          });
           }
 
           //Remove this event from the list.
           eventList.shift();
         }
-      }
+      }*/
+      if(eventList.length) {  eventProcess(); }
 
       //Process object list
-      //for(var index = 0, obj; obj = objList[i++]; ) {
-      $.each(objList, function (index, obj) {
-        if(!objList[index]) { return; }
+      for(var index = 0, obj; obj = objList[index++]; ) {
+//      $.each(objList, function (index, obj) {
+//        if(!objList[index]) { return; }
+        if(!obj) { break; }
 
         //Erase the foreground canvas.
-        obj.clear(ctxFront);
-        //this.publish('g:clearObj', obj, ctxFront);
+        mediator.publish('g:clearObject', obj, ctxFront);
 
         //remove dead planes
         console.log('obj.dead', obj.dead);
@@ -200,15 +192,17 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
             if(selected >= index) { selected--; }
           }
 
-          return;
+//          return;
+//          break;
+          continue;
         }
 
         //remove landed planes
         if(obj.landing && Math.round(obj.velocity()) <= 0) {
           if(obj.selected) { selected = null; }
 
-            console.log('objList.splice('+ index +', 1)');
-            objList.splice(index, 1);
+          console.log('objList.splice('+ index +', 1)');
+          objList.splice(index, 1);
 
           //Update selected index
           if(selected != null) {
@@ -221,32 +215,28 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
 
           //add a new, random plane.
           //addPlane();
-          //continue;
-          return;
+          continue;
+//          break;
         } else if(obj.landing) {
           //update plane location(s).
         // TODO: Integer movement only!?
           //Accelerate landing plane.
           obj.setVelocity(obj.velocity() + obj.a);
-  //          //write('obj.velocity = obj.velocity ${obj.velocity} + obj.a ${obj.a}');
           obj.setScale(obj.scale * .975);
         }
 
         //Collision detection
-        if(collisionDetection(index, obj)) { return; }
+        if(collisionDetection(index, obj)) { /*return;*/ continue; }
 
         //New position and boundary looping
-        reposition(obj);
+        mediator.publish('p:reposition', obj, cX, cY);
         ctxFront.fillStyle = '#FF0000';
 
         //Path stuff.
         if(!obj.hasPath() && path4.length) { //Plane has no path, but map does.
           if(obj.dist(path4[0]) <= obj.pos.r) {
             //Plane has no path, path4 has a point, and plane is near the start of path4
-            //obj.path = path4;
             obj.setPath(path4);
-
-            //obj.waypoint = 1;
           }
         }
 
@@ -254,9 +244,9 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
           var waypoint = obj.waypoint;
 
           //TODO: broadcast graphics message
+//          mediator.publish('g:clearObject', obj.path, ctxFront);
           obj.path.undraw(ctxFront);
-          //mediator.publish('g:drawObject', obj.path, ctxFront);
-          obj.path.draw(ctxFront);
+          mediator.publish('g:drawObject', obj.path, ctxFront);
 
           if(waypoint >= obj.path.length) {  //Path complete.
             console.log('waypoint', waypoint, 'obj.path.length',  obj.path.length);
@@ -266,11 +256,9 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
 
             //Check for runway proximity
             for(var index = 0, runway; runway = runways[index]; index++) {
-//            $.each(runways, function(index, runway) {
               if(obj.dist(runway[0]) <= obj.pos.r) {
                 obj.land(runway);
               }
-//            });
             }
           } else {
             //Redirect the plane.
@@ -285,23 +273,18 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
             }
           }
         }
-      });
+//      });
+      }
 
       //Draw the map path if it has any points.
       if(path4.length) {
-        //TODO: broadcast graphics message
-        //mediator.publish('g:drawObject', path4, ctxFront);
-        path4.draw(ctxFront); 
+        mediator.publish('g:drawObject', path4, ctxFront);
       }
 
       //Draw plane(s) all objects.
-//      for(var index = 0, obj; obj = objList[i]; i++) {
-      $.each(objList, function(index, obj) {
-        //TODO: broadcast graphics message
-        //mediator.publish('g:drawObject', obj, ctxFront);
-        obj.draw(ctxFront);
-      });
-//      }
+      for(var index = 0, obj; obj = objList[index]; index++) {
+        mediator.publish('g:drawObject', obj, ctxFront);
+      }
 
       //Framerate
       frameCount++;
@@ -333,31 +316,62 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       }
     }
 
+    /*****************************************************************************/
+    function stillLoading() {
+      if(loadQueue < 1) {
+        var txtWidth;
 
-    /** Reposition an object according to its current velocity.
-     * @param {Object} obj An object with a position and velocity
-     */
-    function reposition(obj) {
-      //New position.
-      var x = obj.pos.x + Math.round(obj.vx),
-          y = obj.pos.y + Math.round(obj.vy);
-
-      //boundary looping
-      if(x < -obj.pos.r) {
-        x = cX + obj.pos.r;
-      } else if(x > cX + obj.pos.r) {
-        x = -obj.pos.r;
-      }
-      if(y > cY + obj.pos.r) {
-        y = -obj.pos.r;
-      } else if(y < -obj.pos.r) {
-        y = cY + obj.pos.r;
+        ctxFront.save();
+        ctxFront.font = 'bold 30px sans-serif';
+        txtWidth = ctxFront.measureText('LOADING...').width;
+        ctxFront.fillText('LOADING...', cX / 2 - txtWidth / 2, cY / 2);
+        ctxFront.restore();
+        console.log('loadQueue', loadQueue);
+        return true;
       }
 
-      obj.move(new Coord({x: Math.round(x), y: Math.round(y)}));
-
-      return obj;
+      return false;
     }
+
+    function eventProcess() {
+      if(eventList[0].time <= stpFrame.elapsedMilliseconds / 1000) {
+        //Add all planes in this event.
+        for(var index = 0, plane; plane = eventList[0].planes[index++]; ) {
+          console.log('adding plane');
+          addPlane(plane.type,
+              new Coord({x: plane.location.x, y: plane.location.y}),
+              plane.heading);
+          console.log('plane.heading', plane.heading);
+        }
+
+        //Remove this event from the list.
+        eventList.shift();
+      }
+    }
+
+    function clearText() {
+      ctxFront.clearRect(0, 0, 250, 20);              //top left diag text
+      ctxFront.clearRect(0, cY - 35, 150, 20);          //score
+    }
+
+    function endGame() {
+      console.log('Ending game loop.');
+      //Empty the user drawn path
+      path4.length = 0;
+      //stop the game clock.
+      stpFrame.stop();
+
+      //Remove canvas event listeners
+      $(cvsFront).off('mousedown', mDown)
+                 .off('mousedown', mDownPath)
+                 .off('mousemove', mMove4Path)
+                 .off('mouseup', mUp4Path);
+
+      //broadcast level end message
+      mediator.publish('sys:levelEnd');
+      levelEnd();       //inter level transition screen
+    }
+/*****************************************************************************/
 
 
     /** Display the home splash screen and such.
@@ -448,13 +462,13 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
         });
       }
 
-      
+
     /** Callback function to draw an image to the background canvas on image
      *  load.
      */
     function drawBg() {
       mediator.publish('g:drawBg', this, ctxBg, cX, cY);
-      
+
       //
       for(i = 0, runway = null; runway = runways[i++]; ) {
         ctxBg.fillStyle = '#00FF00';
@@ -509,7 +523,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
         $('#dialog-modal').dialog('open');
       }, 'JSON');
     }
-    
+
 
     /** Inter-level transition screen. Re-uses home screen nav buttons */
     function levelEnd() {
@@ -553,7 +567,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       btnHome.one('click', homeClick);
       btnNext.one('click', nextClick);
     }
-    
+
 
     /** Canvas4 mouseDown event handler. Directs leer object toward the click */
     function mDown(ev) {
@@ -813,36 +827,17 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
      */
     function loadPlanes() {
       //Open synchronous GET request.
-//      $.ajax('json/planes.json', {
-//        async : false,
-//        dataType : 'json',
-//        success : function(result) {
-//          //Initialize plane list.
-//          $.each(result.planes, function(index, plane) {
-//            console.log('Adding plane', plane);
-//
-//            imgPlanes.push({
-//              img : loadImage(plane.img),
-//              alpha : loadImage(plane.alpha),
-//              frameWidth : plane.frameWidth,
-//              frameHeight : plane.frameHeight
-//            });
-//          });
-//        }
-//      });
       syncGetJson('json/planes.json', function (result) {
         //Initialize plane list.
-//        $.each(result.planes, function(index, plane) {
         for(var index = 0, plane; plane = result.planes[index]; index++) {
           console.log('Adding plane', plane);
-          
+
           imgPlanes.push({
             img : loadImage(plane.img),
             alpha : loadImage(plane.alpha),
             frameWidth : plane.frameWidth,
             frameHeight : plane.frameHeight
           });
-//        });
         }
       });
     }
@@ -862,7 +857,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
             && !(objList[i].landing || obj.landing)
             && !(objList[i].crashing || obj.crashing)) {  //Collision! oh noes!
           //Canvas cleanup
-          objList[i].clear(ctxFront);
+          mediator.publish('g:clearObject', objList[i], ctxFront);
+//          objList[i].clear(ctxFront);
 
           //Update index of selected plane.
           if(obj.selected || objList[i].selected) selected = null;
@@ -909,8 +905,8 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       loadQueue++;
       console.log('Resource loaded:', this, 'complete: ', this.complete);
     }
-    
-    
+
+
     function syncGetJson(url, callback) {
       $.ajax(url, {
         async : false,
@@ -918,10 +914,10 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
         success : callback
       });
     }
-    
-    
+
+
     function aSyncGetJson(url, callback) {
-      
+
     }
 
 
