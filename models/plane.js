@@ -21,14 +21,11 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
   //  bool landing;
   //  num a, shrinkRate;
 
-
     this.init(opt);
 
 
 //    this.pos = new Ball(pos.x, pos.y, Math.round(Math.max(img.width, img.height) / 2));
     this.pos = new Ball(pos.x, pos.y, Math.round(Math.max(frameWidth, frameHeight) / 2));
-    /*this.width = img.width;
-    this.height = img.height;*/
     this.width = frameWidth;
     this.height = frameHeight;
     this.landing = this.selected = false;
@@ -37,7 +34,11 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
     this.img = new Image();
 
     //Init the masked composite image.
-    this.initMask(alpha, img);
+//    this.initMask(alpha, img);
+    console.log('opt',opt);
+//    opt.mediator.publish('g:maskImg', {obj: this, alpha: alpha, img: img});
+    opt.mediator.installTo(this);
+    this.publish('g:maskImg', this, alpha, img);
 
     //Animation list
     this.animations = {};
@@ -105,7 +106,7 @@ define(['coord','ball', 'path', 'animation'], function(Coord, Ball, Path, Animat
     this.curAnimation = animation;
     this.frame = this.curAnimation.firstFrame;
     this.loop = animation.repeat;
-  }
+  };
 
   /** Set this plane's heading.
    * @param {Number} angle Heading in radians.
@@ -291,44 +292,6 @@ console.log('End of current animation loop');
     this.updateFrame();
   };
 
-  /** Applies the (inverse) alpha mask and saves the composite [ImageElement] to img.
-   * @param {Image} alpha
-   * @param {Image} img
-   */
-  Plane.prototype.initMask = function (alpha, img) {
-    //Create a buffer for off screen drawing.
-    var buffer = document.createElement('canvas');
-    /*buffer.width = this.width;
-    buffer.height = this.height;*/
-    buffer.width = img.width;
-    buffer.height = img.height;
-
-    var ctxBuf = buffer.getContext('2d');
-
-    //Draw alpha mask image to buffer.
-    ctxBuf.drawImage(alpha, 0, 0);
-
-    //Get imagedata
-//    var imgData = ctxBuf.getImageData(0, 0, this.width, this.height);
-    var imgData = ctxBuf.getImageData(0, 0, img.width, img.height);
-    var data = imgData.data;
-
-      //Set alpha channel values for inverse alpha mask.
-    for(var i = data.length - 1; i > 0; i -= 4) {
-      data[i] = 255 - data[i - 3];
-    }
-
-//    ctxBuf.clearRect(0, 0, this.width, this.height);
-    ctxBuf.clearRect(0, 0, img.width, img.height);
-    ctxBuf.putImageData(imgData, 0, 0);
-
-    //Combine image + mask on buffer.
-    ctxBuf.globalCompositeOperation = 'xor';
-    ctxBuf.drawImage(img, 0, 0);
-
-    //Save final image.
-    this.img.src = buffer.toDataURL('image/png');
-  };
 
   /** Move this plane to the specified [Coord]
    * @param {Coord} dest

@@ -171,16 +171,16 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       if(eventList.length) {  eventProcess(); }
 
       //Process object list
-      for(var index = 0, obj; obj = objList[index++]; ) {
+      for(var index = 0, obj; obj = objList[index]; index++) {
 //      $.each(objList, function (index, obj) {
 //        if(!objList[index]) { return; }
-        if(!obj) { break; }
+        if(!obj) { continue; }
 
         //Erase the foreground canvas.
         mediator.publish('g:clearObject', obj, ctxFront);
 
         //remove dead planes
-        console.log('obj.dead', obj.dead);
+//        console.log('obj.dead', obj.dead);
         if(obj.dead) {
           if(obj.selected) { selected = null; }
 
@@ -192,8 +192,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
             if(selected >= index) { selected--; }
           }
 
-//          return;
-//          break;
           continue;
         }
 
@@ -216,7 +214,6 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
           //add a new, random plane.
           //addPlane();
           continue;
-//          break;
         } else if(obj.landing) {
           //update plane location(s).
         // TODO: Integer movement only!?
@@ -296,21 +293,22 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
 
       //Request the next animation frame or end the game.
       if(objList.length === 0 && eventList.length === 0) {
-        console.log('Ending game loop.');
-        //Empty the user drawn path
-        path4.length = 0;
-        //stop the game clock.
-        stpFrame.stop();
-
-        //Remove canvas event listeners
-        $(cvsFront).off('mousedown', mDown)
-                   .off('mousedown', mDownPath)
-                   .off('mousemove', mMove4Path)
-                   .off('mouseup', mUp4Path);
-
-        //TODO: broadcast level end message
-        mediator.publish('sys:levelEnd');
-        levelEnd();       //inter level transition screen
+//        console.log('Ending game loop.');
+//        //Empty the user drawn path
+//        path4.length = 0;
+//        //stop the game clock.
+//        stpFrame.stop();
+//
+//        //Remove canvas event listeners
+//        $(cvsFront).off('mousedown', mDown)
+//                   .off('mousedown', mDownPath)
+//                   .off('mousemove', mMove4Path)
+//                   .off('mouseup', mUp4Path);
+//
+//        //TODO: broadcast level end message
+//        mediator.publish('sys:levelEnd');
+//        levelEnd();       //inter level transition screen
+        endGame();
       } else {
         window.requestAnimationFrame(gameTick);
       }
@@ -777,8 +775,10 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       }
 
       try {
+        console.log(mediator);
         var plane = new Plane(pos, imgPlanes[type].img, imgPlanes[type].alpha,
-                      imgPlanes[type].frameWidth, imgPlanes[type].frameHeight);
+                      imgPlanes[type].frameWidth, imgPlanes[type].frameHeight,
+                      {mediator: mediator});
 
         console.log(plane.animations.flight);
 
@@ -798,6 +798,7 @@ function (require, Coord, Ball, Hue, Path, Plane, Action, StopWatch, Mediator, G
       } catch(e) {
         console.log(imgPlanes);
         console.log(e);
+        console.log(e.stack);
         return;
       }
 
